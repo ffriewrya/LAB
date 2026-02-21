@@ -56,7 +56,8 @@ public class Main {
 
             System.out.println(manager.getReagents());
             System.out.println(manager.getBatches());
-            newReagent.setName("писька");
+
+
         } catch (IllegalArgumentException e) {
             System.err.println("error >< " + e.getMessage());
         }

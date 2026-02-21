@@ -1,6 +1,7 @@
 package ru.itmo.moona;
 
 import java.time.Instant;
+import java.util.Objects;
 
 import static ru.itmo.moona.StockManager.getMethodName;
 import static ru.itmo.moona.StockManager.update;
@@ -99,6 +100,33 @@ public final class StockMove {
 
     public Instant getCreatedAt() {
         return createdAt;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        StockMove stockMove = (StockMove) o;
+        return id == stockMove.id && batchId == stockMove.batchId && Double.compare(quantity, stockMove.quantity) == 0 && type == stockMove.type && unit == stockMove.unit && Objects.equals(reason, stockMove.reason) && Objects.equals(ownerUsername, stockMove.ownerUsername) && Objects.equals(movedAt, stockMove.movedAt) && Objects.equals(createdAt, stockMove.createdAt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, batchId, type, quantity, unit, reason, ownerUsername, movedAt, createdAt);
+    }
+
+    @Override
+    public String toString() {
+        return "StockMove{" +
+                "id=" + id +
+                ", batchId=" + batchId +
+                ", type=" + type +
+                ", quantity=" + quantity +
+                ", unit=" + unit +
+                ", reason='" + reason + '\'' +
+                ", ownerUsername='" + ownerUsername + '\'' +
+                ", movedAt=" + movedAt +
+                ", createdAt=" + createdAt +
+                '}';
     }
 
     private StockMove(MoveBuilder moveBuilder) {
