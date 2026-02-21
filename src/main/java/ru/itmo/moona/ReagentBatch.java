@@ -1,7 +1,6 @@
 package ru.itmo.moona;
 
 import java.time.Instant;
-import java.util.HashMap;
 import java.util.Objects;
 
 import static ru.itmo.moona.StockManager.formatter;
@@ -41,8 +40,8 @@ public final class ReagentBatch {
         return reagentId;
     }
 
-    public void setReagentId(HashMap<Long, Reagent> hm,long reagentId) {
-        if (StockManager.isIdExists(hm, reagentId)) {
+    public void setReagentId(long reagentId) {
+        if (StockManager.isReagentExists(reagentId)) {
             this.reagentId = reagentId;
         } else {
             throw new IllegalArgumentException("reagentId doesn't exists");
@@ -176,13 +175,13 @@ public final class ReagentBatch {
         private Instant updatedAt;
 
 
-        public BatchBuilder setId(Long id) {
+        public BatchBuilder setId(long id) {
             this.id = id;
             return this;
         }
 
-        public BatchBuilder setReagentId(Long reagentId, HashMap<Long, Reagent> hm) {
-            if (StockManager.isIdExists(hm, reagentId)) {
+        public BatchBuilder setReagentId(long reagentId) {
+            if (StockManager.isReagentExists(reagentId)) {
                 this.reagentId = reagentId;
                 return this;
             } else {
@@ -237,13 +236,13 @@ public final class ReagentBatch {
             return this;
         }
 
-        public BatchBuilder setCreatedAt(Instant createdAt) {
-            this.createdAt = createdAt;
+        public BatchBuilder setCreatedAt() {
+            this.createdAt = Instant.now();
             return this;
         }
 
-        public BatchBuilder setUpdatedAt(Instant updatedAt) {
-            this.updatedAt = updatedAt;
+        public BatchBuilder setUpdatedAt() {
+            this.updatedAt = Instant.now();
             return this;
         }
 

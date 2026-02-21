@@ -129,17 +129,6 @@ public final class Reagent {
         private Instant createdAt;
         private Instant updatedAt;
 
-//        public ReagentBuilder(String name, String ownerUsername, Instant createdAt, Instant updatedAt) {
-//            if (name == null || name.isBlank() || name.length() >= 128) {
-//                throw new IllegalArgumentException("...name cannot be blank OR above 128 symbols");
-//            } else {
-//                this.name = name;
-//                this.ownerUsername = ownerUsername;
-//                this.createdAt = createdAt;
-//                this.updatedAt = updatedAt;
-//            }
-//        }
-
         public String getName() {
             return name;
         }
@@ -170,13 +159,13 @@ public final class Reagent {
             return this;
         }
 
-        public ReagentBuilder setCreatedAt(Instant createdAt) {
-            this.createdAt = createdAt;
+        public ReagentBuilder setCreatedAt() {
+            this.createdAt = Instant.now();
             return this;
         }
 
-        public ReagentBuilder setUpdatedAt(Instant updatedAt) {
-            this.updatedAt = updatedAt;
+        public ReagentBuilder setUpdatedAt() {
+            this.updatedAt = Instant.now();
             return this;
         }
 

@@ -5,8 +5,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
 public class StockManager {
-    private final HashMap<Long, Reagent> reagents = new HashMap<>();
-    private final HashMap<Long, ReagentBatch> batches = new HashMap<>();
+    private static final HashMap<Long, Reagent> reagents = new HashMap<>();
+    private static final HashMap<Long, ReagentBatch> batches = new HashMap<>();
     private Long ReagentId = 0L;
     private Long BatchId = 0L;
 
@@ -31,8 +31,11 @@ public class StockManager {
 
     }
 
-    public static boolean isIdExists(HashMap<Long, Reagent> h, Long idToCheck) {
-        return h.containsKey(idToCheck);
+    public static boolean isReagentExists(long idToCheck) {
+        return reagents.containsKey(idToCheck);
+    }
+    public static boolean isBatchExists(long idToCheck) {
+        return batches.containsKey(idToCheck);
     }
 
     public static BatchUnit findUnit(String unit) {
@@ -53,6 +56,20 @@ public class StockManager {
         }
         throw new IllegalArgumentException("status should be ACTIVE or ARCHIVED");
 
+    }
+
+    public static StockMoveType findType(String type) {
+        for (StockMoveType mt : StockMoveType.values()) {
+            if (mt.name().equalsIgnoreCase(type)) {
+                return mt;
+            }
+        }
+        throw new IllegalArgumentException("type should be IN, OUT or DISCARD");
+    }
+
+    public static BatchUnit setMoveUnit (long batchId) {
+        BatchUnit unit = batches.get(batchId).getUnit();
+        return unit;
     }
 
     public HashMap<Long, Reagent> getReagents() {

@@ -11,8 +11,6 @@ public class Main {
         StockManager manager = new StockManager();
 
 
-        //переделать вотд класс менеджер
-
 
         try {
             Reagent newReagent = new Reagent.ReagentBuilder()
@@ -21,13 +19,11 @@ public class Main {
                     .setOwnerUsername("SYSTEM")
                     .setFormula("NaCl")
                     .setCas("120-319-3")
-                    .setCreatedAt(Instant.now())
-                    .setUpdatedAt(Instant.now())
+                    .setCreatedAt()
+                    .setUpdatedAt()
                     .build();
             manager.addReagent(newReagent);
 
-
-            // подумать насчет add
 
 
             Reagent newReagent1 = new Reagent.ReagentBuilder()
@@ -37,22 +33,22 @@ public class Main {
                     .setFormula("NaCl")
                     .setCas("120-319-3")
                     .setHazardClass("low")
-                    .setCreatedAt(Instant.now())
-                    .setUpdatedAt(Instant.now())
+                    .setCreatedAt()
+                    .setUpdatedAt()
                     .build();
             manager.addReagent(newReagent1);
 
             ReagentBatch batch1 = new ReagentBatch.BatchBuilder()
                     .setId(manager.genBId())
-                    .setReagentId(1L, manager.getReagents())
+                    .setReagentId(1)
                     .setLabel("First Lab Batch")
                     .setQuantityCurrent(500.0)
                     .setUnit("G")
                     .setLocation("Shelf A1")
                     .setStatus("ACTIVE")
                     .setOwnerUsername("admin")
-                    .setCreatedAt(Instant.now())
-                    .setUpdatedAt(Instant.now())
+                    .setCreatedAt()
+                    .setUpdatedAt()
                     .build();
             manager.addBatch(batch1);
 
