@@ -1,0 +1,220 @@
+package ru.itmo.moona;
+
+import java.time.Instant;
+import java.util.Objects;
+import static ru.itmo.moona.StockManager.formatter;
+
+public final class Reagent {
+
+    private long id;
+    private String name;
+    private String formula;
+    private String cas;
+    private String hazardClass;
+    private String ownerUsername;
+    private Instant createdAt;
+    private Instant updatedAt;
+
+    private Reagent(ReagentBuilder reagentBuilder) {
+        this.id = reagentBuilder.id;
+        this.name = reagentBuilder.name;
+        this.formula = reagentBuilder.formula;
+        this.cas = reagentBuilder.cas;
+        this.hazardClass = reagentBuilder.hazardClass;
+        this.ownerUsername = reagentBuilder.ownerUsername;
+        this.createdAt = reagentBuilder.createdAt;
+        this.updatedAt = reagentBuilder.updatedAt;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        if (name == null || name.isEmpty() || name.isBlank() || name.length() >= 128) {
+            throw new IllegalArgumentException("...name cannot be blank OR above 128 symbols");
+        } else {
+            this.name = name;
+        }
+    }
+
+    public String getFormula() {
+        return formula;
+    }
+
+    public void setFormula(String formula) {
+        if (formula != null && formula.length() > 32) {
+            throw new IllegalArgumentException("this formula is just too much");
+        } else {
+            this.formula = formula;
+        }
+    }
+
+    public String getCas() {
+        return cas;
+    }
+
+    public void setCas(String cas) {
+        if (cas != null && cas.length() > 32) {
+            throw new IllegalArgumentException("cas is too long..");
+        } else {
+            this.cas = cas;
+        }
+    }
+
+    public String getHazardClass() {
+        return hazardClass;
+    }
+
+    public void setHazardClass(String hazardClass) {
+        if (hazardClass != null && hazardClass.length() > 32) {
+            throw new IllegalArgumentException("this thing is WAY too... hazardous??");
+        } else {
+            this.hazardClass = hazardClass;
+        }
+    }
+
+    public String getOwnerUsername() {
+        return ownerUsername;
+    }
+
+    public void setOwnerUsername(String ownerUsername) {
+        this.ownerUsername = ownerUsername;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(Instant updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    @Override
+    public String toString() {
+        return "Reagent{" + "id=" + id + ", name='" + name + '\'' + ", formula='" + formula + '\'' + ", cas='" + cas + '\'' + ", hazardClass='" + hazardClass + '\'' + ", ownerUsername='" + ownerUsername + '\'' + ", createdAt=" + formatter.format(createdAt) + ", updatedAt=" + formatter.format(updatedAt) + '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Reagent reagent = (Reagent) o;
+        return id == reagent.id && Objects.equals(name, reagent.name) && Objects.equals(formula, reagent.formula) && Objects.equals(cas, reagent.cas) && Objects.equals(hazardClass, reagent.hazardClass) && Objects.equals(ownerUsername, reagent.ownerUsername) && Objects.equals(createdAt, reagent.createdAt) && Objects.equals(updatedAt, reagent.updatedAt);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    public static class ReagentBuilder {
+        private long id;
+        private String name;
+        private String formula; //optional
+        private String cas; //optional
+        private String hazardClass; //optional
+        private String ownerUsername;
+        private Instant createdAt;
+        private Instant updatedAt;
+
+//        public ReagentBuilder(String name, String ownerUsername, Instant createdAt, Instant updatedAt) {
+//            if (name == null || name.isBlank() || name.length() >= 128) {
+//                throw new IllegalArgumentException("...name cannot be blank OR above 128 symbols");
+//            } else {
+//                this.name = name;
+//                this.ownerUsername = ownerUsername;
+//                this.createdAt = createdAt;
+//                this.updatedAt = updatedAt;
+//            }
+//        }
+
+        public String getName() {
+            return name;
+        }
+
+        public String getFormula() {
+            return formula;
+        }
+
+        public String getCas() {
+            return cas;
+        }
+
+        public String getHazardClass() {
+            return hazardClass;
+        }
+
+        public ReagentBuilder setName(String name) {
+            if (name == null || name.isBlank() || name.length() >= 128) {
+                throw new IllegalArgumentException("...name cannot be blank OR above 128 symbols");
+            } else {
+                this.name = name;
+                return this;
+            }
+        }
+
+        public ReagentBuilder setOwnerUsername(String ownerUsername) {
+            this.ownerUsername = ownerUsername;
+            return this;
+        }
+
+        public ReagentBuilder setCreatedAt(Instant createdAt) {
+            this.createdAt = createdAt;
+            return this;
+        }
+
+        public ReagentBuilder setUpdatedAt(Instant updatedAt) {
+            this.updatedAt = updatedAt;
+            return this;
+        }
+
+
+        public ReagentBuilder setFormula(String formula) {
+            if (formula != null && formula.length() > 32) {
+                throw new IllegalArgumentException("this formula is just too much");
+            } else {
+                this.formula = formula;
+                return this;
+            }
+        }
+
+        public ReagentBuilder setCas(String cas) {
+            if (cas != null && cas.length() > 32) {
+                throw new IllegalArgumentException("cas is too long");
+            } else {
+                this.cas = cas;
+                return this;
+            }
+        }
+
+        public ReagentBuilder setHazardClass(String hazardClass) {
+            if (hazardClass != null && hazardClass.length() > 32) {
+                throw new IllegalArgumentException("this thing is WAY too... hazardous??");
+            } else {
+                this.hazardClass = hazardClass;
+                return this;
+            }
+        }
+
+        public ReagentBuilder setId(Long id) {
+            this.id = id;
+            return this;
+        }
+
+        public Reagent build() {
+            return new Reagent(this);
+        }
+    }
+}
