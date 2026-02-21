@@ -1,7 +1,9 @@
 package ru.itmo.moona;
 
 import java.time.Instant;
-import java.util.HashMap;
+
+import static ru.itmo.moona.StockManager.getMethodName;
+import static ru.itmo.moona.StockManager.update;
 
 public final class StockMove {
     private long id;
@@ -27,6 +29,9 @@ public final class StockMove {
         if (StockManager.isBatchExists(batchId)) {
             this.batchId = batchId;
             this.unit = StockManager.setMoveUnit(batchId);
+            update(this);
+            System.out.println(getMethodName() + " was changed to " + batchId);
+            System.out.println("as well as the unit was changed to" + this.unit);
         } else {
             throw new IllegalArgumentException("batchId doesn't exists");
         }
@@ -38,6 +43,8 @@ public final class StockMove {
 
     public void setType(String type) {
         this.type = StockManager.findType(type);
+        update(this);
+        System.out.println(getMethodName() + " was changed to " + type);
     }
 
     public double getQuantity() {
@@ -48,7 +55,10 @@ public final class StockMove {
         if (quantity < 0) {
             throw new IllegalArgumentException("quantity can't be negative");
         } else {
-            this.quantity = quantity; }
+            this.quantity = quantity;
+            update(this);
+            System.out.println(getMethodName() + " was changed to " + quantity);
+        }
     }
 
     public BatchUnit getUnit() {
@@ -64,6 +74,8 @@ public final class StockMove {
             throw new IllegalArgumentException("reason can't be above 128 symbols");
         } else {
             this.reason = reason;
+            update(this);
+            System.out.println(getMethodName() + " was changed to " + reason);
         }
     }
 
@@ -73,6 +85,8 @@ public final class StockMove {
 
     public void setOwnerUsername(String ownerUsername) {
         this.ownerUsername = ownerUsername;
+        update(this);
+        System.out.println(getMethodName() + " was changed to " + ownerUsername);
     }
 
     public Instant getMovedAt() {
@@ -81,15 +95,10 @@ public final class StockMove {
 
     public void setMovedAt(Instant movedAt) {
         this.movedAt = movedAt;
-        //подумать как сделать апдейт
     }
 
     public Instant getCreatedAt() {
         return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
     }
 
     private StockMove(MoveBuilder moveBuilder) {

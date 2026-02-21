@@ -52,12 +52,16 @@ public class Main {
                     .build();
             manager.addBatch(batch1);
 
+
+
+            System.out.println(manager.getReagents());
+            System.out.println(manager.getBatches());
+            newReagent.setName("писька");
         } catch (IllegalArgumentException e) {
             System.err.println("error >< " + e.getMessage());
         }
 
-        System.out.println(manager.getReagents());
-        System.out.println(manager.getBatches());
+
 
 
     }

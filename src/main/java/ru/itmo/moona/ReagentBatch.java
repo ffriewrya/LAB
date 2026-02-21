@@ -3,7 +3,7 @@ package ru.itmo.moona;
 import java.time.Instant;
 import java.util.Objects;
 
-import static ru.itmo.moona.StockManager.formatter;
+import static ru.itmo.moona.StockManager.*;
 
 public final class ReagentBatch {
     private long id;
@@ -43,6 +43,8 @@ public final class ReagentBatch {
     public void setReagentId(long reagentId) {
         if (StockManager.isReagentExists(reagentId)) {
             this.reagentId = reagentId;
+            update(this);
+            System.out.println(getMethodName() + " was changed to " + reagentId);
         } else {
             throw new IllegalArgumentException("reagentId doesn't exists");
         }
@@ -57,6 +59,8 @@ public final class ReagentBatch {
             throw new IllegalArgumentException("label can't be blank or above 64 symbols");
         } else {
             this.label = label;
+            update(this);
+            System.out.println(getMethodName() + " was changed to " + label);
         }
     }
 
@@ -69,6 +73,8 @@ public final class ReagentBatch {
             throw new IllegalArgumentException("current quantity can't be negative");
         } else {
             this.quantityCurrent = quantityCurrent;
+            update(this);
+            System.out.println(getMethodName() + " was changed to " + quantityCurrent);
         }
     }
 
@@ -78,6 +84,8 @@ public final class ReagentBatch {
 
     public void setUnit(BatchUnit unit) {
         this.unit = unit;
+        update(this);
+        System.out.println(getMethodName() + " was changed to " + unit);
     }
 
     public String getLocation() {
@@ -89,6 +97,8 @@ public final class ReagentBatch {
             throw new IllegalArgumentException("location can't be blank or above 64 symbols");
         } else {
             this.location = location;
+            update(this);
+            System.out.println(getMethodName() + " was changed to " + location);
         }
     }
 
@@ -98,6 +108,8 @@ public final class ReagentBatch {
 
     public void setExpiresAt(Instant expiresAt) {
         this.expiresAt = expiresAt;
+        update(this);
+        System.out.println(getMethodName() + " was changed to " + expiresAt);
     }
 
     public BatchStatus getStatus() {
@@ -106,6 +118,8 @@ public final class ReagentBatch {
 
     public void setStatus(BatchStatus status) {
         this.status = status;
+        update(this);
+        System.out.println(getMethodName() + " was changed to " + status);
     }
 
     public String getOwnerUsername() {
@@ -114,14 +128,12 @@ public final class ReagentBatch {
 
     public void setOwnerUsername(String ownerUsername) {
         this.ownerUsername = ownerUsername;
+        update(this);
+        System.out.println(getMethodName() + " was changed to " + ownerUsername);
     }
 
     public Instant getCreatedAt() {
         return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
     }
 
     public Instant getUpdatedAt() {

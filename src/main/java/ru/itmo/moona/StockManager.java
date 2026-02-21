@@ -1,5 +1,6 @@
 package ru.itmo.moona;
 
+import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -79,6 +80,26 @@ public class StockManager {
     public HashMap<Long, ReagentBatch> getBatches() {
         return batches;
     }
+
+
+    public static String getMethodName() {
+        String name = Thread.currentThread().getStackTrace()[2].getMethodName();
+        String field = name.replace("set", "");
+        return field;
+    }
+
+    public static void update(Reagent r) {
+        r.setUpdatedAt(Instant.now());
+    }
+
+    public static void update(ReagentBatch b) {
+        b.setUpdatedAt(Instant.now());
+    }
+
+    public static void update(StockMove m) {
+        m.setMovedAt(Instant.now());
+    }
+
 
     public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE, d.MM.yyyy HH:mm:ss")
             .withZone(ZoneId.systemDefault());

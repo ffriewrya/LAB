@@ -2,7 +2,8 @@ package ru.itmo.moona;
 
 import java.time.Instant;
 import java.util.Objects;
-import static ru.itmo.moona.StockManager.formatter;
+
+import static ru.itmo.moona.StockManager.*;
 
 public final class Reagent {
 
@@ -39,6 +40,8 @@ public final class Reagent {
             throw new IllegalArgumentException("...name cannot be blank OR above 128 symbols");
         } else {
             this.name = name;
+            update(this);
+            System.out.println(getMethodName() + " was changed to " + name);
         }
     }
 
@@ -51,6 +54,8 @@ public final class Reagent {
             throw new IllegalArgumentException("this formula is just too much");
         } else {
             this.formula = formula;
+            update(this);
+            System.out.println(getMethodName() + " was changed to " + formula);
         }
     }
 
@@ -63,6 +68,8 @@ public final class Reagent {
             throw new IllegalArgumentException("cas is too long..");
         } else {
             this.cas = cas;
+            update(this);
+            System.out.println(getMethodName() + " was changed to " + formula);
         }
     }
 
@@ -75,6 +82,8 @@ public final class Reagent {
             throw new IllegalArgumentException("this thing is WAY too... hazardous??");
         } else {
             this.hazardClass = hazardClass;
+            update(this);
+            System.out.println(getMethodName() + " was changed to " + hazardClass);
         }
     }
 
@@ -84,14 +93,12 @@ public final class Reagent {
 
     public void setOwnerUsername(String ownerUsername) {
         this.ownerUsername = ownerUsername;
+        update(this);
+        System.out.println(getMethodName() + " was changed to " + ownerUsername);
     }
 
     public Instant getCreatedAt() {
         return createdAt;
-    }
-
-    public void setCreatedAt(Instant createdAt) {
-        this.createdAt = createdAt;
     }
 
     public Instant getUpdatedAt() {
