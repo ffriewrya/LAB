@@ -1,12 +1,13 @@
 package ru.itmo.moona;
 
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.Objects;
 
 import static ru.itmo.moona.StockManager.*;
 
 public final class ReagentBatch {
-    private long id;
+    private final long id;
     private long reagentId;
     private String label;
     private double quantityCurrent;
@@ -15,7 +16,7 @@ public final class ReagentBatch {
     private Instant expiresAt;
     private BatchStatus status;
     private String ownerUsername;
-    private Instant createdAt;
+    private final Instant createdAt;
     private Instant updatedAt;
 
     private ReagentBatch(BatchBuilder batchBuilder) {
@@ -46,7 +47,7 @@ public final class ReagentBatch {
             update(this);
             System.out.println(getMethodName() + " was changed to " + reagentId);
         } else {
-            throw new IllegalArgumentException("reagentId doesn't exists");
+            throw new IllegalArgumentException("reagentId doesn't exist");
         }
     }
 
@@ -56,7 +57,7 @@ public final class ReagentBatch {
 
     public void setLabel(String label) {
         if (label == null || label.isBlank() || label.length() > 64) {
-            throw new IllegalArgumentException("label can't be blank or above 64 symbols");
+            throw new IllegalArgumentException("label can't be null or have a length exceeding 64 characters.");
         } else {
             this.label = label;
             update(this);
@@ -94,7 +95,7 @@ public final class ReagentBatch {
 
     public void setLocation(String location) {
         if (location == null || location.isBlank() || location.length() > 64) {
-            throw new IllegalArgumentException("location can't be blank or above 64 symbols");
+            throw new IllegalArgumentException("location can't be blank or have a length exceeding 64 characters.");
         } else {
             this.location = location;
             update(this);
@@ -116,10 +117,9 @@ public final class ReagentBatch {
         return status;
     }
 
-    public void setStatus(BatchStatus status) {
-        this.status = status;
+    public void setStatus(String status) {
+        this.status = StockManager.findStatus(status);
         update(this);
-        System.out.println(getMethodName() + " was changed to " + status);
     }
 
     public String getOwnerUsername() {
@@ -156,21 +156,10 @@ public final class ReagentBatch {
         return Objects.hash(id, reagentId, label, quantityCurrent, unit, location, expiresAt, status, ownerUsername, createdAt, updatedAt);
     }
 
+
     @Override
     public String toString() {
-        return "ReagentBatch{" +
-                "id=" + id +
-                ", reagentId=" + reagentId +
-                ", label='" + label + '\'' +
-                ", quantityCurrent=" + quantityCurrent +
-                ", unit=" + unit +
-                ", location='" + location + '\'' +
-                ", expiresAt=" + expiresAt +
-                ", status=" + status +
-                ", ownerUsername='" + ownerUsername + '\'' +
-                ", createdAt=" + formatter.format(createdAt) +
-                ", updatedAt=" + formatter.format(updatedAt) +
-                '}';
+        return String.format("%-4s %-10s %-15s %-10s %-10s %-15s %-15s %-10s %-15s %-25s %-25s", id, reagentId, label, quantityCurrent, unit, location, formatterExp.format(expiresAt), status, ownerUsername, formatter.format(createdAt), formatter.format(updatedAt));
     }
 
     public static class BatchBuilder {
@@ -197,13 +186,13 @@ public final class ReagentBatch {
                 this.reagentId = reagentId;
                 return this;
             } else {
-                throw new IllegalArgumentException("reagentId doesn't exists");
+                throw new IllegalArgumentException("reagentId doesn't exist");
             }
         }
 
         public BatchBuilder setLabel(String label) {
             if (label == null || label.isBlank() || label.length() > 64) {
-                throw new IllegalArgumentException("label can't be blank or above 64 symbols");
+                throw new IllegalArgumentException("label can't be null or have a length exceeding 64 characters.");
             } else {
                 this.label = label;
                 return this;
@@ -226,16 +215,20 @@ public final class ReagentBatch {
 
         public BatchBuilder setLocation(String location) {
             if (location == null || location.isBlank() || location.length() > 64) {
-                throw new IllegalArgumentException("location can't be blank or above 64 symbols");
+                throw new IllegalArgumentException("location can't be blank or have a length exceeding 64 characters.");
             } else {
                 this.location = location;
                 return this;
             }
         }
 
-        public BatchBuilder setExpiresAt(Instant expiresAt) {
-            this.expiresAt = expiresAt;
-            return this;
+        public BatchBuilder setExpiresAt(String expiresAt) {
+            try {
+                this.expiresAt = parseDate(expiresAt);
+                return this;
+            } catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("invalid expiration date. expected dd-MM-yyyy");
+            }
         }
 
         public BatchBuilder setStatus(String status) {

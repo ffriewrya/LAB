@@ -1,13 +1,13 @@
 package ru.itmo.moona;
 
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.util.Objects;
 
-import static ru.itmo.moona.StockManager.getMethodName;
-import static ru.itmo.moona.StockManager.update;
+import static ru.itmo.moona.StockManager.*;
 
 public final class StockMove {
-    private long id;
+    private final long id;
     private long batchId;
     private StockMoveType type;
     private double quantity;
@@ -15,7 +15,7 @@ public final class StockMove {
     private String reason;
     private String ownerUsername;
     private Instant movedAt;
-    private Instant createdAt;
+    private final Instant createdAt;
 
     public long getId() {
         return id;
@@ -34,7 +34,7 @@ public final class StockMove {
             System.out.println(getMethodName() + " was changed to " + batchId);
             System.out.println("as well as the unit was changed to" + this.unit);
         } else {
-            throw new IllegalArgumentException("batchId doesn't exists");
+            throw new IllegalArgumentException("batchId doesn't exist.");
         }
     }
 
@@ -54,7 +54,7 @@ public final class StockMove {
 
     public void setQuantity(double quantity) {
         if (quantity < 0) {
-            throw new IllegalArgumentException("quantity can't be negative");
+            throw new IllegalArgumentException("quantity can't be negative.");
         } else {
             this.quantity = quantity;
             update(this);
@@ -72,7 +72,7 @@ public final class StockMove {
 
     public void setReason(String reason) {
         if (reason.length() > 128) {
-            throw new IllegalArgumentException("reason can't be above 128 symbols");
+            throw new IllegalArgumentException("reason can't have a length exceeding 128 characters.");
         } else {
             this.reason = reason;
             update(this);
@@ -116,17 +116,7 @@ public final class StockMove {
 
     @Override
     public String toString() {
-        return "StockMove{" +
-                "id=" + id +
-                ", batchId=" + batchId +
-                ", type=" + type +
-                ", quantity=" + quantity +
-                ", unit=" + unit +
-                ", reason='" + reason + '\'' +
-                ", ownerUsername='" + ownerUsername + '\'' +
-                ", movedAt=" + movedAt +
-                ", createdAt=" + createdAt +
-                '}';
+        return String.format("%-4s %-10s %-15s %-10s %-10s %-15s %-15s %-15s %-25s", id, batchId, type, quantity, unit, reason, ownerUsername, formatterExp.format(movedAt), formatter.format(createdAt));
     }
 
     private StockMove(MoveBuilder moveBuilder) {
@@ -163,7 +153,7 @@ public final class StockMove {
                 this.batchId = batchId;
                 return this;
             } else {
-                throw new IllegalArgumentException("batchId doesn't exists");
+                throw new IllegalArgumentException("batchId doesn't exist.");
             }
         }
 
@@ -174,7 +164,7 @@ public final class StockMove {
 
         public MoveBuilder setQuantity(double quantity) {
             if (quantity < 0) {
-                throw new IllegalArgumentException("quantity can't be negative");
+                throw new IllegalArgumentException("quantity can't be negative.");
             } else {
                 this.quantity = quantity;
                 return this;
@@ -188,7 +178,7 @@ public final class StockMove {
 
         public MoveBuilder setReason(String reason) {
             if (reason.length() > 128) {
-                throw new IllegalArgumentException("reason can't be above 128 symbols");
+                throw new IllegalArgumentException("reason can't have a length exceeding 128 characters.");
             } else {
                 this.reason = reason;
                 return this;
@@ -200,13 +190,17 @@ public final class StockMove {
             return this;
         }
 
-        public MoveBuilder setMovedAt(Instant movedAt) {
-            if (movedAt == null) {
-                this.movedAt = Instant.now();
+        public MoveBuilder setMovedAt() {
+            this.movedAt = Instant.now();
+            return this;
+        }
+
+        public MoveBuilder setMovedAt(String movedAt) {
+            try {
+                this.movedAt = parseDate(movedAt);
                 return this;
-            } else {
-                this.movedAt = movedAt;
-                return this;
+            } catch (DateTimeParseException e) {
+                throw new IllegalArgumentException("invalid moving date. expected dd-MM-yyyy.");
             }
         }
 

@@ -1,8 +1,7 @@
 import ru.itmo.moona.Reagent;
 import ru.itmo.moona.ReagentBatch;
 import ru.itmo.moona.StockManager;
-
-import java.time.Instant;
+import ru.itmo.moona.StockMove;
 
 import static ru.itmo.moona.StockManager.*;
 
@@ -11,10 +10,9 @@ public class Main {
         StockManager manager = new StockManager();
 
 
-
         try {
             Reagent newReagent = new Reagent.ReagentBuilder()
-                    .setId(manager.genRId())
+                    .setId(manager.genReagentId())
                     .setName("Sodium Chloride")
                     .setOwnerUsername("SYSTEM")
                     .setFormula("NaCl")
@@ -25,10 +23,9 @@ public class Main {
             manager.addReagent(newReagent);
 
 
-
             Reagent newReagent1 = new Reagent.ReagentBuilder()
-                    .setId(manager.genRId())
-                    .setName("Sodium Chlorisddasdde")
+                    .setId(manager.genReagentId())
+                    .setName("Sulphine Sodium")
                     .setOwnerUsername("SYSTEM")
                     .setFormula("NaCl")
                     .setCas("120-319-3")
@@ -39,30 +36,56 @@ public class Main {
             manager.addReagent(newReagent1);
 
             ReagentBatch batch1 = new ReagentBatch.BatchBuilder()
-                    .setId(manager.genBId())
+                    .setId(manager.genBatchId())
                     .setReagentId(1)
-                    .setLabel("First Lab Batch")
+                    .setLabel("First Batch")
                     .setQuantityCurrent(500.0)
                     .setUnit("G")
                     .setLocation("Shelf A1")
-                    .setStatus("ACTIVE")
-                    .setOwnerUsername("admin")
+                    .setStatus("ARCHIVED")
+                    .setOwnerUsername("SYSTEM")
+                    .setExpiresAt("01-06-2026")
                     .setCreatedAt()
                     .setUpdatedAt()
                     .build();
             manager.addBatch(batch1);
 
 
+            StockMove move = new StockMove.MoveBuilder()
+                    .setId(manager.genMoveId())
+                    .setBatchId(4)
+                    .setType("in")
+                    .setQuantity(500)
+                    .setUnit()
+                    .setReason("just did")
+                    .setOwnerUsername("SYSTEM")
+                    .setMovedAt("02-06-2026")
+                    .setCreatedAt()
+                    .build();
+            manager.addMove(move);
 
-            System.out.println(manager.getReagents());
-            System.out.println(manager.getBatches());
+            printReagents();
+            System.out.println();
+            printBatches();
+            System.out.println();
+            printMoves();
+            System.out.println();
+            findReagent("sodium");
+            System.out.println();
+            findBatch(1);
+            System.out.println();
+            showBatch(1);
+            stockReport();
 
 
         } catch (IllegalArgumentException e) {
-            System.err.println("error >< " + e.getMessage());
+            System.err.println("error! " + e.getMessage());
         }
 
-
+        //todo убрать СЕТТЕРЫ И АПДЕЙТ Т_ттТТТт
+        //todo забыл команду про move
+        //todo tru catch для парсера
+        //todo побольше исключений для команд
 
 
     }
