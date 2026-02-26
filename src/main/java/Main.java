@@ -17,6 +17,7 @@ public class Main {
                     .setOwnerUsername("SYSTEM")
                     .setFormula("NaCl")
                     .setCas("120-319-3")
+                    .setHazardClass("")
                     .setCreatedAt()
                     .setUpdatedAt()
                     .build();
@@ -53,7 +54,7 @@ public class Main {
 
             StockMove move = new StockMove.MoveBuilder()
                     .setId(manager.genMoveId())
-                    .setBatchId(4)
+                    .setBatchId(1)
                     .setType("in")
                     .setQuantity(500)
                     .setUnit()
@@ -82,10 +83,12 @@ public class Main {
             System.err.println("error! " + e.getMessage());
         }
 
-        //todo убрать СЕТТЕРЫ И АПДЕЙТ Т_ттТТТт
-        //todo забыл команду про move
-        //todo tru catch для парсера
-        //todo побольше исключений для команд
+        /*
+         todo try catch для парсера
+         todo побольше исключений для команд
+         todo проверить по тз
+         todo подписать что optional
+        */
 
 
     }

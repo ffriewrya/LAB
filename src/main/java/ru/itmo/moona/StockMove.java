@@ -30,9 +30,6 @@ public final class StockMove {
         if (StockManager.isBatchExists(batchId)) {
             this.batchId = batchId;
             this.unit = StockManager.setMoveUnit(batchId);
-            update(this);
-            System.out.println(getMethodName() + " was changed to " + batchId);
-            System.out.println("as well as the unit was changed to" + this.unit);
         } else {
             throw new IllegalArgumentException("batchId doesn't exist.");
         }
@@ -44,8 +41,6 @@ public final class StockMove {
 
     public void setType(String type) {
         this.type = StockManager.findType(type);
-        update(this);
-        System.out.println(getMethodName() + " was changed to " + type);
     }
 
     public double getQuantity() {
@@ -57,8 +52,6 @@ public final class StockMove {
             throw new IllegalArgumentException("quantity can't be negative.");
         } else {
             this.quantity = quantity;
-            update(this);
-            System.out.println(getMethodName() + " was changed to " + quantity);
         }
     }
 
@@ -75,8 +68,6 @@ public final class StockMove {
             throw new IllegalArgumentException("reason can't have a length exceeding 128 characters.");
         } else {
             this.reason = reason;
-            update(this);
-            System.out.println(getMethodName() + " was changed to " + reason);
         }
     }
 
@@ -86,8 +77,6 @@ public final class StockMove {
 
     public void setOwnerUsername(String ownerUsername) {
         this.ownerUsername = ownerUsername;
-        update(this);
-        System.out.println(getMethodName() + " was changed to " + ownerUsername);
     }
 
     public Instant getMovedAt() {
@@ -160,6 +149,10 @@ public final class StockMove {
         public MoveBuilder setType(String type) {
             this.type = StockManager.findType(type);
             return this;
+        }
+
+        public StockMoveType getType() {
+            return type;
         }
 
         public MoveBuilder setQuantity(double quantity) {

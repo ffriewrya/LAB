@@ -14,37 +14,38 @@ public class StockManager {
     private static final HashMap<Long, Reagent> reagents = new HashMap<>();
     private static final HashMap<Long, ReagentBatch> batches = new HashMap<>();
     private static final HashMap<Long, StockMove> moves = new HashMap<>();
-    private Long reagentId = 0L;
-    private Long batchId = 0L;
-    private Long moveId = 0L;
+    private static Long reagentId = 0L;
+    private static Long batchId = 0L;
+    private static Long moveId = 0L;
 
-    public Long genReagentId() {
+    public static Long genReagentId() {
         Long generatedId = 1L + reagentId;
         return generatedId;
     }
 
-    public Long genBatchId() {
+    public static Long genBatchId() {
         Long generatedId = 1L + batchId;
         return generatedId;
     }
 
-    public Long genMoveId() {
+    public static Long genMoveId() {
         Long generatedId = 1L + moveId;
         return generatedId;
     }
 
-    public void addBatch(ReagentBatch b) {
+    public static void addBatch(ReagentBatch b) {
         batches.put(b.getId(), b);
         batchId++;
     }
 
-    public void addReagent(Reagent r) {
+    public static void addReagent(Reagent r) {
         reagents.put(r.getId(), r);
         reagentId++;
     }
 
-    public void addMove(StockMove m) {
+    public static void addMove(StockMove m) {
         moves.put(m.getId(), m);
+        update(batches.get(m.getBatchId()));
         moveId++;
     }
 
@@ -99,11 +100,11 @@ public class StockManager {
     }
 
 
-    public static String getMethodName() {
-        String name = Thread.currentThread().getStackTrace()[2].getMethodName();
-        String field = name.replace("set", "");
-        return field;
-    }
+//    public static String getMethodName() {
+//        String name = Thread.currentThread().getStackTrace()[2].getMethodName();
+//        String field = name.replace("set", "");
+//        return field;
+//    }
 
     public static void update(Reagent r) {
         r.setUpdatedAt(Instant.now());
@@ -243,10 +244,18 @@ public class StockManager {
         }
     }
 
-    public static void archiveBatch (long id) {
-        ReagentBatch b = batches.get(id);
-        b.setStatus("ARCHIVED");
-        System.out.println("batch " + id + " now is archived.");
+    public static void archiveBatch(long id) {
+        if (isBatchExists(id)) {
+            ReagentBatch b = batches.get(id);
+            if (b.getStatus() == BatchStatus.ARCHIVED) {
+                throw new IllegalArgumentException("this batch is already archived.");
+            } else {
+                b.setStatus("ARCHIVED");
+                System.out.println("batch " + id + " now is archived.");
+            }
+        } else {
+            throw new IllegalArgumentException("haven't found any batch");
+        }
     }
 
     public static void stockReport() {
@@ -276,6 +285,32 @@ public class StockManager {
             }
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("invalid date format. expected dd-MM-yyyy.");
+        }
+    }
+
+    public static void moveIn(StockMove move) {
+        ReagentBatch batch = batches.get(move.getBatchId());
+        double quantity = move.getQuantity();
+        double currentQuantity = batch.getQuantityCurrent();
+        batch.setQuantityCurrent(currentQuantity + quantity);
+    }
+
+    public static void moveOutDiscard (StockMove move) {
+        ReagentBatch batch = batches.get(move.getBatchId());
+        double quantity = move.getQuantity();
+        double currentQuantity = batch.getQuantityCurrent();
+        if (quantity > currentQuantity) {
+            throw new IllegalArgumentException("insufficient quantity. current stock is less than the requested amount to move");
+        } else {
+            batch.setQuantityCurrent(currentQuantity - quantity);
+        }
+    }
+
+    public static boolean isBatchArcived (long id) {
+        if (batches.get(id).getStatus() == BatchStatus.ARCHIVED) {
+            return true;
+        } else {
+            return false;
         }
     }
 

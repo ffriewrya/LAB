@@ -40,8 +40,6 @@ public final class Reagent {
             throw new IllegalArgumentException("name can't be null or have a length exceeding 128 characters.");
         } else {
             this.name = name;
-            update(this);
-            System.out.println(getMethodName() + " was changed to " + name);
         }
     }
 
@@ -54,8 +52,6 @@ public final class Reagent {
             throw new IllegalArgumentException("formula can't be null or have a length exceeding 32 characters.");
         } else {
             this.formula = formula;
-            update(this);
-            System.out.println(getMethodName() + " was changed to " + formula);
         }
     }
 
@@ -68,8 +64,6 @@ public final class Reagent {
             throw new IllegalArgumentException("cas can't be null or have a length exceeding 32 characters.");
         } else {
             this.cas = cas;
-            update(this);
-            System.out.println(getMethodName() + " was changed to " + formula);
         }
     }
 
@@ -82,8 +76,6 @@ public final class Reagent {
             throw new IllegalArgumentException("hazard class can't be null or have a length exceeding 32 characters.");
         } else {
             this.hazardClass = hazardClass;
-            update(this);
-            System.out.println(getMethodName() + " was changed to " + hazardClass);
         }
     }
 
@@ -93,8 +85,6 @@ public final class Reagent {
 
     public void setOwnerUsername(String ownerUsername) {
         this.ownerUsername = ownerUsername;
-        update(this);
-        System.out.println(getMethodName() + " was changed to " + ownerUsername);
     }
 
     public Instant getCreatedAt() {

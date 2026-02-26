@@ -4,15 +4,15 @@ import ru.itmo.moona.StockManager;
 import ru.itmo.moona.commands.base.Command;
 import ru.itmo.moona.commands.base.InputParser;
 
-public class BatchShowCommand implements Command {
+public class BatchArchiveCommand implements Command {
     @Override
     public void execute(InputParser input) {
         try {
             if (input.getArg().isBlank()) {
-                throw new IllegalArgumentException("expected batch ID");
+                throw new IllegalArgumentException("expected a batch ID");
             } else {
                 long id = Long.parseLong(input.getArg());
-                StockManager.showBatch(id);
+                StockManager.archiveBatch(id);
             }
         } catch (NumberFormatException e) {
             System.err.println("invalid id. expected a number");
@@ -21,11 +21,11 @@ public class BatchShowCommand implements Command {
 
     @Override
     public String getName() {
-        return "batch_show";
+        return "batch_archive";
     }
 
     @Override
     public String getDescription() {
-        return "<batch_id> displays a batch by its id";
+        return "<batch_id> sets batches status to ARCHIVED.";
     }
 }
