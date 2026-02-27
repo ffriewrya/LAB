@@ -1,3 +1,5 @@
+package ru.itmo.moona;
+
 import ru.itmo.moona.cli.base.CommandManager;
 import ru.itmo.moona.cli.commands.*;
 
