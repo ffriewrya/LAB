@@ -1,9 +1,9 @@
-package ru.itmo.moona.commands;
+package ru.itmo.moona.cli.commands;
 
-import ru.itmo.moona.ReagentBatch;
-import ru.itmo.moona.StockManager;
-import ru.itmo.moona.commands.base.Command;
-import ru.itmo.moona.commands.base.InputParser;
+import ru.itmo.moona.domain.ReagentBatch;
+import ru.itmo.moona.service.StockManager;
+import ru.itmo.moona.cli.base.Command;
+import ru.itmo.moona.cli.base.InputParser;
 
 import java.util.Scanner;
 
@@ -16,7 +16,7 @@ public class AddBatchCommand implements Command {
 
     @Override
     public void execute(InputParser input) {
-        if (input.getArg().isBlank()) {
+        if (input.getArg() == null || input.getArg().isBlank()) {
             throw new IllegalArgumentException("expected a reagent ID");
         } else {
             ReagentBatch.BatchBuilder builder = new ReagentBatch.BatchBuilder();
@@ -27,7 +27,6 @@ public class AddBatchCommand implements Command {
 
             while (true) {
                 try {
-                    System.out.println("enter existing reagent id");
                     String idInput = input.getArg();
                     long id = Long.parseLong(idInput);
                     builder.setReagentId(id);
@@ -99,7 +98,7 @@ public class AddBatchCommand implements Command {
 
             while (true) {
                 try {
-                    System.out.println("enter expiration date");
+                    System.out.println("enter expiration date (optional)");
                     String date = scanner.nextLine();
                     builder.setExpiresAt(date);
                     break;

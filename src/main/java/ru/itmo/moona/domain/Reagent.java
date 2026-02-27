@@ -1,9 +1,9 @@
-package ru.itmo.moona;
+package ru.itmo.moona.domain;
 
 import java.time.Instant;
 import java.util.Objects;
 
-import static ru.itmo.moona.StockManager.*;
+import static ru.itmo.moona.service.StockManager.*;
 
 public final class Reagent {
 
@@ -102,7 +102,7 @@ public final class Reagent {
 
     @Override
     public String toString() {
-        return String.format("%-4s %-20s %-10s %-15s %-15s %-15s %-25s %-25s", id, name, formula, cas, hazardClass, ownerUsername, formatter.format(createdAt), formatter.format(updatedAt)) ;
+        return String.format("%-4s %-20s %-10s %-15s %-15s %-15s %-25s %-25s", id, name, formula, cas, hazardClass, ownerUsername, formatter.format(createdAt), formatter.format(updatedAt));
     }
 
     @Override

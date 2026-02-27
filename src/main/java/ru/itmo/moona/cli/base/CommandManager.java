@@ -1,4 +1,4 @@
-package ru.itmo.moona.commands.base;
+package ru.itmo.moona.cli.base;
 
 import java.util.HashMap;
 

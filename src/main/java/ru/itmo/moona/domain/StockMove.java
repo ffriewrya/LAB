@@ -1,10 +1,12 @@
-package ru.itmo.moona;
+package ru.itmo.moona.domain;
+
+import ru.itmo.moona.service.StockManager;
 
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.util.Objects;
 
-import static ru.itmo.moona.StockManager.*;
+import static ru.itmo.moona.service.StockManager.*;
 
 public final class StockMove {
     private final long id;

@@ -1,4 +1,6 @@
-package ru.itmo.moona;
+package ru.itmo.moona.service;
+
+import ru.itmo.moona.domain.*;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -100,12 +102,6 @@ public class StockManager {
     }
 
 
-//    public static String getMethodName() {
-//        String name = Thread.currentThread().getStackTrace()[2].getMethodName();
-//        String field = name.replace("set", "");
-//        return field;
-//    }
-
     public static void update(Reagent r) {
         r.setUpdatedAt(Instant.now());
     }
@@ -149,11 +145,15 @@ public class StockManager {
     }
 
     public static Instant parseDate(String date) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-        LocalDate localDate = LocalDate.parse(date, formatter);
-        LocalDateTime localDateTime = localDate.atStartOfDay();
-        Instant finalDate = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
-        return finalDate;
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            LocalDate localDate = LocalDate.parse(date, formatter);
+            LocalDateTime localDateTime = localDate.atStartOfDay();
+            Instant finalDate = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
+            return finalDate;
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("invalid date. expected dd-MM-yyyy");
+        }
     }
 
     public static void findReagent(String name) {
@@ -295,7 +295,7 @@ public class StockManager {
         batch.setQuantityCurrent(currentQuantity + quantity);
     }
 
-    public static void moveOutDiscard (StockMove move) {
+    public static void moveOutDiscard(StockMove move) {
         ReagentBatch batch = batches.get(move.getBatchId());
         double quantity = move.getQuantity();
         double currentQuantity = batch.getQuantityCurrent();
@@ -306,12 +306,36 @@ public class StockManager {
         }
     }
 
-    public static boolean isBatchArcived (long id) {
+    public static boolean isBatchArcived(long id) {
         if (batches.get(id).getStatus() == BatchStatus.ARCHIVED) {
             return true;
         } else {
             return false;
         }
+    }
+
+    public static void updLocation(long id, String location) {
+        ReagentBatch batch = batches.get(id);
+        batch.setLocation(location);
+        update(batch);
+    }
+
+    public static void updExpiresAt(long id, String date) {
+        ReagentBatch batch = batches.get(id);
+        batch.setExpiresAt(parseDate(date));
+        update(batch);
+    }
+
+    public static void updStatus(long id, String status) {
+        ReagentBatch batch = batches.get(id);
+        batch.setStatus(status);
+        update(batch);
+    }
+
+    public static void updLabel(long id, String label) {
+        ReagentBatch batch = batches.get(id);
+        batch.setLabel(label);
+        update(batch);
     }
 
     public static DateTimeFormatter formatterExp = DateTimeFormatter.ofPattern("d.MM.yyyy")

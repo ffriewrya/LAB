@@ -1,4 +1,4 @@
-package ru.itmo.moona;
+package ru.itmo.moona.domain;
 
 public enum BatchStatus {
     ACTIVE,

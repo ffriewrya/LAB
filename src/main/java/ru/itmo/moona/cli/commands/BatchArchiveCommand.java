@@ -1,14 +1,14 @@
-package ru.itmo.moona.commands;
+package ru.itmo.moona.cli.commands;
 
-import ru.itmo.moona.StockManager;
-import ru.itmo.moona.commands.base.Command;
-import ru.itmo.moona.commands.base.InputParser;
+import ru.itmo.moona.service.StockManager;
+import ru.itmo.moona.cli.base.Command;
+import ru.itmo.moona.cli.base.InputParser;
 
 public class BatchArchiveCommand implements Command {
     @Override
     public void execute(InputParser input) {
         try {
-            if (input.getArg().isBlank()) {
+            if (input.getArg() == null || input.getArg().isBlank()) {
                 throw new IllegalArgumentException("expected a batch ID");
             } else {
                 long id = Long.parseLong(input.getArg());

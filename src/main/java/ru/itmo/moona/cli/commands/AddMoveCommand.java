@@ -1,10 +1,10 @@
-package ru.itmo.moona.commands;
+package ru.itmo.moona.cli.commands;
 
-import ru.itmo.moona.StockManager;
-import ru.itmo.moona.StockMove;
-import ru.itmo.moona.StockMoveType;
-import ru.itmo.moona.commands.base.Command;
-import ru.itmo.moona.commands.base.InputParser;
+import ru.itmo.moona.service.StockManager;
+import ru.itmo.moona.domain.StockMove;
+import ru.itmo.moona.domain.StockMoveType;
+import ru.itmo.moona.cli.base.Command;
+import ru.itmo.moona.cli.base.InputParser;
 
 import java.util.Scanner;
 
@@ -17,7 +17,7 @@ public class AddMoveCommand implements Command {
 
     @Override
     public void execute(InputParser input) {
-        if (input.getArg().isBlank()) {
+        if (input.getArg() == null || input.getArg().isBlank()) {
             throw new IllegalArgumentException("expected a batch ID");
         } else {
             StockMove.MoveBuilder builder = new StockMove.MoveBuilder();
@@ -27,7 +27,6 @@ public class AddMoveCommand implements Command {
 
             while (true) {
                 try {
-                    System.out.println("enter existing batch id");
                     String idInput = input.getArg();
                     long id = Long.parseLong(idInput);
                     if (StockManager.isBatchArcived(id)) {
@@ -71,7 +70,7 @@ public class AddMoveCommand implements Command {
 
             while (true) {
                 try {
-                    System.out.println("enter reason");
+                    System.out.println("enter reason (optional)");
                     String reason = scanner.nextLine();
                     builder.setReason(reason);
                     break;
@@ -82,7 +81,7 @@ public class AddMoveCommand implements Command {
 
             while (true) {
                 try {
-                    System.out.println("enter moving date");
+                    System.out.println("enter moving date (optional)");
                     String date = scanner.nextLine();
                     if (date.isBlank()) {
                         builder.setMovedAt();
@@ -94,15 +93,15 @@ public class AddMoveCommand implements Command {
                     System.err.println(e.getMessage());
                 }
             }
-            StockMove move = builder.build();
-            StockManager.addMove(move);
             try {
+                StockMove move = builder.build();
                 if (move.getType() == StockMoveType.IN) {
                     StockManager.moveIn(move);
                 } else {
                     StockManager.moveOutDiscard(move);
                 }
-                System.out.println("successfully applied a move " + move.getId());
+                StockManager.addMove(move);
+                System.out.println("successfully applied move " + move.getId());
             } catch (IllegalArgumentException e) {
                 System.err.println("oops! " + e.getMessage());
             }

@@ -1,10 +1,13 @@
-package ru.itmo.moona;
+package ru.itmo.moona.domain;
+
+import ru.itmo.moona.service.StockManager;
 
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
-import static ru.itmo.moona.StockManager.*;
+import static ru.itmo.moona.service.StockManager.*;
 
 public final class ReagentBatch {
     private final long id;
@@ -208,6 +211,10 @@ public final class ReagentBatch {
         }
 
         public BatchBuilder setExpiresAt(String expiresAt) {
+            if (expiresAt == null || expiresAt.isBlank()) {
+                this.expiresAt = Instant.now().plus(365, ChronoUnit.DAYS);
+                return this;
+            }
             try {
                 this.expiresAt = parseDate(expiresAt);
                 return this;

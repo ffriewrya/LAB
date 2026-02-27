@@ -1,96 +1,42 @@
-import ru.itmo.moona.Reagent;
-import ru.itmo.moona.ReagentBatch;
-import ru.itmo.moona.StockManager;
-import ru.itmo.moona.StockMove;
+import ru.itmo.moona.cli.base.CommandManager;
+import ru.itmo.moona.cli.commands.*;
 
-import static ru.itmo.moona.StockManager.*;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
-        StockManager manager = new StockManager();
+        CommandManager commandManager = new CommandManager();
+        Scanner scanner = new Scanner(System.in);
+        commandManager.create(new HelpCommand(commandManager.getCommands()));
+        commandManager.create(new AddBatchCommand(scanner));
+        commandManager.create(new AddMoveCommand(scanner));
+        commandManager.create(new AddReagentCommand(scanner));
+        commandManager.create(new BatchArchiveCommand());
+        commandManager.create(new BatchListCommand());
+        commandManager.create(new BatchShowCommand());
+        commandManager.create(new MoveListCommand());
+        commandManager.create(new ReagentListCommand());
+        commandManager.create(new StockReportCommand());
+        commandManager.create(new UpdateBatchCommand());
+        commandManager.create(new ExitCommand());
 
+        System.out.println("hiiiiIIIiiiiii! welcome to Reagent Stock");
+        System.out.println("type 'help' for a list of commands");
 
-        try {
-            Reagent newReagent = new Reagent.ReagentBuilder()
-                    .setId(manager.genReagentId())
-                    .setName("Sodium Chloride")
-                    .setOwnerUsername("SYSTEM")
-                    .setFormula("NaCl")
-                    .setCas("120-319-3")
-                    .setHazardClass("")
-                    .setCreatedAt()
-                    .setUpdatedAt()
-                    .build();
-            manager.addReagent(newReagent);
+        while (true) {
+            String input = scanner.nextLine().trim();
+            if (input.isBlank()) {
+                continue;
+            }
 
-
-            Reagent newReagent1 = new Reagent.ReagentBuilder()
-                    .setId(manager.genReagentId())
-                    .setName("Sulphine Sodium")
-                    .setOwnerUsername("SYSTEM")
-                    .setFormula("NaCl")
-                    .setCas("120-319-3")
-                    .setHazardClass("low")
-                    .setCreatedAt()
-                    .setUpdatedAt()
-                    .build();
-            manager.addReagent(newReagent1);
-
-            ReagentBatch batch1 = new ReagentBatch.BatchBuilder()
-                    .setId(manager.genBatchId())
-                    .setReagentId(1)
-                    .setLabel("First Batch")
-                    .setQuantityCurrent(500.0)
-                    .setUnit("G")
-                    .setLocation("Shelf A1")
-                    .setStatus("ARCHIVED")
-                    .setOwnerUsername("SYSTEM")
-                    .setExpiresAt("01-06-2026")
-                    .setCreatedAt()
-                    .setUpdatedAt()
-                    .build();
-            manager.addBatch(batch1);
-
-
-            StockMove move = new StockMove.MoveBuilder()
-                    .setId(manager.genMoveId())
-                    .setBatchId(1)
-                    .setType("in")
-                    .setQuantity(500)
-                    .setUnit()
-                    .setReason("just did")
-                    .setOwnerUsername("SYSTEM")
-                    .setMovedAt("02-06-2026")
-                    .setCreatedAt()
-                    .build();
-            manager.addMove(move);
-
-            printReagents();
-            System.out.println();
-            printBatches();
-            System.out.println();
-            printMoves();
-            System.out.println();
-            findReagent("sodium");
-            System.out.println();
-            findBatch(1);
-            System.out.println();
-            showBatch(1);
-            stockReport();
-
-
-        } catch (IllegalArgumentException e) {
-            System.err.println("error! " + e.getMessage());
+            try {
+                commandManager.start(input);
+            } catch (IllegalArgumentException e) {
+                System.err.println("error! " + e.getMessage());
+            } catch (Exception e) {
+                System.err.println("an unexpected error " + e.getMessage());
+            }
         }
-
-        /*
-         todo try catch для парсера
-         todo побольше исключений для команд
-         todo проверить по тз
-         todo подписать что optional
-        */
-
-
     }
 }
 
