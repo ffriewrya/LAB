@@ -59,6 +59,10 @@ public class StockManager {
         return batches.containsKey(idToCheck);
     }
 
+    public static boolean isMoveExists(long idToCheck) {
+        return moves.containsKey(idToCheck);
+    }
+
     public static BatchUnit findUnit(String unit) {
         for (BatchUnit bu : BatchUnit.values()) {
             if (bu.name().equalsIgnoreCase(unit)) {
@@ -97,7 +101,7 @@ public class StockManager {
         return reagents;
     }
 
-    public HashMap<Long, ReagentBatch> getBatches() {
+    public static HashMap<Long, ReagentBatch> getBatches() {
         return batches;
     }
 
@@ -293,6 +297,7 @@ public class StockManager {
         double quantity = move.getQuantity();
         double currentQuantity = batch.getQuantityCurrent();
         batch.setQuantityCurrent(currentQuantity + quantity);
+        batch.addMemento(batch.createMemento());
     }
 
     public static void moveOutDiscard(StockMove move) {
@@ -303,10 +308,11 @@ public class StockManager {
             throw new IllegalArgumentException("insufficient quantity. current stock is less than the requested amount to move");
         } else {
             batch.setQuantityCurrent(currentQuantity - quantity);
+            batch.addMemento(batch.createMemento());
         }
     }
 
-    public static boolean isBatchArcived(long id) {
+    public static boolean isBatchArchived(long id) {
         if (batches.get(id).getStatus() == BatchStatus.ARCHIVED) {
             return true;
         } else {
@@ -337,6 +343,48 @@ public class StockManager {
         batch.setLabel(label);
         update(batch);
     }
+
+    public static void removeReagent(Reagent r) {
+        reagents.remove(r.getId());
+    }
+
+    public static void redoReagent(Reagent r) {
+        reagents.put(r.getId(), r);
+    }
+
+    public static void removeBatch(ReagentBatch b) {
+        batches.remove(b.getId());
+    }
+
+    public static void redoBatch(ReagentBatch b) {
+        batches.put(b.getId(), b);
+    }
+
+    public static void removeMove(StockMove m) {
+        moves.remove(m.getId());
+    }
+
+    public static void redoMove(StockMove m) {
+        moves.put(m.getId(), m);
+    }
+
+    public static ReagentBatch getBatch(long id) {
+        if (isBatchExists(id)) {
+            return batches.get(id);
+        } else {
+            throw new IllegalArgumentException("invalid id. haven't found any batches");
+        }
+    }
+
+    public static void printHistory(ReagentBatch batch) {
+        List<ReagentBatch.BatchMemento> history = batch.getHistory();
+        System.out.printf("%-10s %-15s %-10s %-10s %-15s %-15s %-10s %-15s %-25s %-25s", "Reagent", "Label", "Quantity", "Unit", "Location", "Expires at", "Status", "Owner", "Created at", "Updated at");
+        for (int i = 0; i < history.size(); i++) {
+            System.out.println();
+            System.out.println(history.get(i).toString());
+        }
+    }
+
 
     public static DateTimeFormatter formatterExp = DateTimeFormatter.ofPattern("d.MM.yyyy")
             .withZone(ZoneId.systemDefault());

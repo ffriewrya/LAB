@@ -21,6 +21,9 @@ public class Main {
         commandManager.create(new StockReportCommand());
         commandManager.create(new UpdateBatchCommand());
         commandManager.create(new ExitCommand());
+        commandManager.create(new UndoCommand());
+        commandManager.create(new RedoCommand());
+        commandManager.create(new BatchHistoryCommand());
 
         System.out.println("hiiiiIIIiiiiii! welcome to Reagent Stock");
         System.out.println("type 'help' for a list of commands");

@@ -5,12 +5,14 @@ import ru.itmo.moona.service.StockManager;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static ru.itmo.moona.service.StockManager.*;
 
 public final class ReagentBatch {
-    private final long id;
+    private long id;
     private long reagentId;
     private String label;
     private double quantityCurrent;
@@ -19,8 +21,10 @@ public final class ReagentBatch {
     private Instant expiresAt;
     private BatchStatus status;
     private String ownerUsername;
-    private final Instant createdAt;
+    private Instant createdAt;
     private Instant updatedAt;
+
+    private final List<BatchMemento> history = new ArrayList<>();
 
     private ReagentBatch(BatchBuilder batchBuilder) {
         this.id = batchBuilder.id;
@@ -106,6 +110,10 @@ public final class ReagentBatch {
 
     public BatchStatus getStatus() {
         return status;
+    }
+
+    public List<BatchMemento> getHistory() {
+        return history;
     }
 
     public void setStatus(String status) {
@@ -244,9 +252,69 @@ public final class ReagentBatch {
         }
 
         public ReagentBatch build() {
-            return new ReagentBatch(this);
+            ReagentBatch batch = new ReagentBatch(this);
+            batch.addMemento(batch.createMemento());
+            return batch;
         }
 
+
+    }
+
+    public void addMemento(BatchMemento m) {
+        this.history.add(m);
+    }
+
+    public BatchMemento createMemento() {
+        return new BatchMemento(this.reagentId, this.label, this.quantityCurrent, this.unit, this.location, this.expiresAt, this.status, this.ownerUsername, this.createdAt, this.updatedAt);
+    }
+
+    public void restoreStatusFromMemento(BatchMemento m) {
+        this.status = m.status;
+    }
+
+    public void restoreFromMemento(BatchMemento m) {
+        this.reagentId = m.reagentId;
+        this.label = m.label;
+        this.quantityCurrent = m.quantityCurrent;
+        this.unit = m.unit;
+        this.location = m.location;
+        this.expiresAt = m.expiresAt;
+        this.status = m.status;
+        this.ownerUsername = m.ownerUsername;
+        this.createdAt = m.createdAt;
+        this.updatedAt = m.updatedAt;
+    }
+
+    public static class BatchMemento {
+        private long reagentId;
+        private String label;
+        private double quantityCurrent;
+        private BatchUnit unit;
+        private String location;
+        private Instant expiresAt;
+        private BatchStatus status;
+        private String ownerUsername;
+        private Instant createdAt;
+        private Instant updatedAt;
+
+
+        private BatchMemento(long reagentId, String label, double quantityCurrent, BatchUnit unit, String location, Instant expiresAt, BatchStatus status, String ownerUsername, Instant createdAt, Instant updatedAt) {
+            this.reagentId = reagentId;
+            this.label = label;
+            this.quantityCurrent = quantityCurrent;
+            this.unit = unit;
+            this.location = location;
+            this.expiresAt = expiresAt;
+            this.status = status;
+            this.ownerUsername = ownerUsername;
+            this.createdAt = createdAt;
+            this.updatedAt = updatedAt;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%-10s %-15s %-10s %-10s %-15s %-15s %-10s %-15s %-25s %-25s", reagentId, label, quantityCurrent, unit, location, formatterExp.format(expiresAt), status, ownerUsername, formatter.format(createdAt), formatter.format(updatedAt));
+        }
 
     }
 }

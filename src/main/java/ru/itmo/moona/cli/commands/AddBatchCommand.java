@@ -1,5 +1,6 @@
 package ru.itmo.moona.cli.commands;
 
+import ru.itmo.moona.cli.base.Undoable;
 import ru.itmo.moona.domain.ReagentBatch;
 import ru.itmo.moona.service.StockManager;
 import ru.itmo.moona.cli.base.Command;
@@ -7,8 +8,11 @@ import ru.itmo.moona.cli.base.InputParser;
 
 import java.util.Scanner;
 
-public class AddBatchCommand implements Command {
+import static ru.itmo.moona.service.StockManager.*;
+
+public class AddBatchCommand implements Command, Undoable {
     private final Scanner scanner;
+    private ReagentBatch createdBatch;
 
     public AddBatchCommand(Scanner scanner) {
         this.scanner = scanner;
@@ -25,15 +29,12 @@ public class AddBatchCommand implements Command {
             builder.setUpdatedAt();
             builder.setOwnerUsername("SYSTEM");
 
-            while (true) {
-                try {
-                    String idInput = input.getArg();
-                    long id = Long.parseLong(idInput);
-                    builder.setReagentId(id);
-                    break;
-                } catch (NumberFormatException e) {
-                    System.err.println("invalid id. expected a number");
-                }
+            try {
+                String idInput = input.getArg();
+                long id = Long.parseLong(idInput);
+                builder.setReagentId(id);
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("invalid id. expected a number");
             }
 
             while (true) {
@@ -107,9 +108,9 @@ public class AddBatchCommand implements Command {
                 }
             }
 
-            ReagentBatch batch = builder.build();
-            StockManager.addBatch(batch);
-            System.out.println("successfully added a batch " + batch.getId());
+            createdBatch = builder.build();
+            StockManager.addBatch(createdBatch);
+            System.out.println("successfully added a batch " + createdBatch.getId());
         }
     }
 
@@ -122,4 +123,28 @@ public class AddBatchCommand implements Command {
     public String getDescription() {
         return "<reagent_id> creates a batch of existing reagent";
     }
+
+    @Override
+    public void undo() {
+        if (createdBatch == null) {
+            throw new IllegalArgumentException("there is no created reagent. can't undo.");
+        }
+        removeBatch(createdBatch);
+        System.out.println("successfully removed batch " + createdBatch.getId());
+    }
+
+
+    @Override
+    public void redo() {
+        if (createdBatch == null) {
+            throw new IllegalArgumentException("there is no created reagent. can't redo.");
+        }
+        if (!isBatchExists(createdBatch.getId())) {
+            StockManager.redoBatch(createdBatch);
+            System.out.println("batch " + createdBatch.getId() + " has been re-added.");
+        } else {
+            throw new IllegalArgumentException("reagent already exists. can't redo.");
+        }
+    }
 }
+
