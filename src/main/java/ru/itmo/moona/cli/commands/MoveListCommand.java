@@ -5,6 +5,12 @@ import ru.itmo.moona.cli.base.Command;
 import ru.itmo.moona.cli.base.InputParser;
 
 public class MoveListCommand implements Command {
+    private final StockManager manager;
+
+    public MoveListCommand(StockManager manager) {
+        this.manager = manager;
+    }
+
     @Override
     public void execute(InputParser input) {
         try {
@@ -13,10 +19,10 @@ public class MoveListCommand implements Command {
             } else {
                 long id = Long.parseLong(input.getArg());
                 if (input.getKeyValue() == null || input.getKeyValue().isBlank()) {
-                    StockManager.showMoves(id);
+                    manager.showMoves(id);
                 } else {
                     int amount = Integer.parseInt(input.getKeyValue());
-                    StockManager.showAmountOfMoves(id, amount);
+                    manager.showAmountOfMoves(id, amount);
                 }
             }
         } catch (NumberFormatException e) {

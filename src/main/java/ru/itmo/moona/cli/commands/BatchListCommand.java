@@ -5,6 +5,12 @@ import ru.itmo.moona.cli.base.Command;
 import ru.itmo.moona.cli.base.InputParser;
 
 public class BatchListCommand implements Command {
+    private final StockManager manager;
+
+    public BatchListCommand(StockManager manager) {
+        this.manager = manager;
+    }
+
     @Override
     public void execute(InputParser input) {
         try {
@@ -13,9 +19,9 @@ public class BatchListCommand implements Command {
             } else {
                 long id = Long.parseLong(input.getArg());
                 if (input.getKey() != null && input.getKey().equalsIgnoreCase("--active")) {
-                    StockManager.findActiveBatch(id);
+                    manager.findActiveBatch(id);
                 } else {
-                    StockManager.findBatch(id);
+                    manager.findBatch(id);
                 }
             }
         } catch (NumberFormatException e) {

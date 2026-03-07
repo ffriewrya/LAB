@@ -5,15 +5,21 @@ import ru.itmo.moona.cli.base.Command;
 import ru.itmo.moona.cli.base.InputParser;
 
 public class ReagentListCommand implements Command {
+    private final StockManager manager;
+
+    public ReagentListCommand(StockManager manager) {
+        this.manager = manager;
+    }
+
     @Override
     public void execute(InputParser input) {
         if (input.getKeyValue() == null || input.getKeyValue().isBlank()) {
-            StockManager.printReagents();
+            manager.printReagents();
         } else {
             if (input.getKeyValue().length() > 64) {
                 throw new IllegalArgumentException("query exceeds maximum length of 64 characters");
             } else {
-                StockManager.findReagent(input.getArg());
+                manager.findReagent(input.getArg());
             }
         }
     }

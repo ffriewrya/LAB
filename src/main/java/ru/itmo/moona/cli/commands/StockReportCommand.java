@@ -5,12 +5,18 @@ import ru.itmo.moona.cli.base.Command;
 import ru.itmo.moona.cli.base.InputParser;
 
 public class StockReportCommand implements Command {
+    private final StockManager manager;
+
+    public StockReportCommand(StockManager manager) {
+        this.manager = manager;
+    }
+
     @Override
     public void execute(InputParser input) {
         if (input.getKey() == null || input.getKey().isBlank()) {
-            StockManager.stockReport();
+            manager.stockReport();
         } else {
-            StockManager.stockReport(input.getKeyValue());
+            manager.stockReport(input.getKeyValue());
         }
     }
 

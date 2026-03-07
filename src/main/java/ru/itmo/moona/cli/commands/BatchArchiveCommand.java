@@ -7,10 +7,14 @@ import ru.itmo.moona.cli.base.Command;
 import ru.itmo.moona.cli.base.InputParser;
 
 public class BatchArchiveCommand implements Command, Undoable {
-
+    private final StockManager manager;
     private long batchId;
     private ReagentBatch.BatchMemento oldMemento;
     private ReagentBatch.BatchMemento newMemento;
+
+    public BatchArchiveCommand(StockManager manager) {
+        this.manager = manager;
+    }
 
     @Override
     public void execute(InputParser input) {
@@ -19,9 +23,9 @@ public class BatchArchiveCommand implements Command, Undoable {
                 throw new IllegalArgumentException("expected a batch ID");
             } else {
                 this.batchId = Long.parseLong(input.getArg());
-                ReagentBatch batch = StockManager.getBatch(batchId);
+                ReagentBatch batch = manager.getBatch(batchId);
                 this.oldMemento = batch.createMemento();
-                StockManager.archiveBatch(batchId);
+                manager.archiveBatch(batchId);
                 this.newMemento = batch.createMemento();
                 batch.addMemento(newMemento);
             }
@@ -45,7 +49,7 @@ public class BatchArchiveCommand implements Command, Undoable {
         if (oldMemento == null) {
             throw new IllegalArgumentException("there is no previous state. can't undo");
         }
-        StockManager.getBatch(batchId).restoreStatusFromMemento(oldMemento);
+        manager.getBatch(batchId).restoreStatusFromMemento(oldMemento);
         System.out.println("batch " + this.batchId + " status has been restored");
 
     }
@@ -55,7 +59,7 @@ public class BatchArchiveCommand implements Command, Undoable {
         if (newMemento == null) {
             throw new IllegalArgumentException("there is no new state. can't redo");
         }
-        StockManager.getBatch(batchId).restoreStatusFromMemento(newMemento);
+        manager.getBatch(batchId).restoreStatusFromMemento(newMemento);
         System.out.println("batch " + this.batchId + " status has been redone.");
 
     }

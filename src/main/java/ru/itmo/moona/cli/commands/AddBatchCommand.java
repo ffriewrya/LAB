@@ -5,17 +5,18 @@ import ru.itmo.moona.domain.ReagentBatch;
 import ru.itmo.moona.service.StockManager;
 import ru.itmo.moona.cli.base.Command;
 import ru.itmo.moona.cli.base.InputParser;
+import ru.itmo.moona.service.StockUtils;
 
 import java.util.Scanner;
-
-import static ru.itmo.moona.service.StockManager.*;
 
 public class AddBatchCommand implements Command, Undoable {
     private final Scanner scanner;
     private ReagentBatch createdBatch;
+    private final StockManager manager;
 
-    public AddBatchCommand(Scanner scanner) {
+    public AddBatchCommand(Scanner scanner, StockManager manager) {
         this.scanner = scanner;
+        this.manager = manager;
     }
 
     @Override
@@ -24,7 +25,7 @@ public class AddBatchCommand implements Command, Undoable {
             throw new IllegalArgumentException("expected a reagent ID");
         } else {
             ReagentBatch.BatchBuilder builder = new ReagentBatch.BatchBuilder();
-            builder.setId(StockManager.genBatchId());
+            builder.setId(manager.genBatchId());
             builder.setCreatedAt();
             builder.setUpdatedAt();
             builder.setOwnerUsername("SYSTEM");
@@ -32,6 +33,9 @@ public class AddBatchCommand implements Command, Undoable {
             try {
                 String idInput = input.getArg();
                 long id = Long.parseLong(idInput);
+                if (!manager.reagentExists(id)) {
+                    throw new IllegalArgumentException("reagentId doesn't exist");
+                }
                 builder.setReagentId(id);
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException("invalid id. expected a number");
@@ -109,7 +113,7 @@ public class AddBatchCommand implements Command, Undoable {
             }
 
             createdBatch = builder.build();
-            StockManager.addBatch(createdBatch);
+            manager.addBatch(createdBatch);
             System.out.println("successfully added a batch " + createdBatch.getId());
         }
     }
@@ -129,7 +133,7 @@ public class AddBatchCommand implements Command, Undoable {
         if (createdBatch == null) {
             throw new IllegalArgumentException("there is no created reagent. can't undo.");
         }
-        removeBatch(createdBatch);
+        manager.removeBatch(createdBatch);
         System.out.println("successfully removed batch " + createdBatch.getId());
     }
 
@@ -139,8 +143,8 @@ public class AddBatchCommand implements Command, Undoable {
         if (createdBatch == null) {
             throw new IllegalArgumentException("there is no created reagent. can't redo.");
         }
-        if (!isBatchExists(createdBatch.getId())) {
-            StockManager.redoBatch(createdBatch);
+        if (!manager.batchExists(createdBatch.getId())) {
+            manager.redoBatch(createdBatch);
             System.out.println("batch " + createdBatch.getId() + " has been re-added.");
         } else {
             throw new IllegalArgumentException("reagent already exists. can't redo.");

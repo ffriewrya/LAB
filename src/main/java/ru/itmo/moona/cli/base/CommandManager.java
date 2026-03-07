@@ -5,8 +5,8 @@ import java.util.Stack;
 
 public class CommandManager {
     private final HashMap<String, Command> commands = new HashMap<>();
-    private final static Stack<Undoable> undoStack = new Stack<>();
-    private final static Stack<Undoable> redoStack = new Stack<>();
+    private final Stack<Undoable> undoStack = new Stack<>();
+    private final Stack<Undoable> redoStack = new Stack<>();
 
     public void create(Command command) {
         commands.put(command.getName(), command);
@@ -35,7 +35,7 @@ public class CommandManager {
         redoStack.clear();
     }
 
-    public static void undo() {
+    public void undo() {
         if (undoStack.isEmpty()) {
             throw new IllegalArgumentException("nothing to undo.");
         }
@@ -44,7 +44,7 @@ public class CommandManager {
         redoStack.push(cmd);
     }
 
-    public static void redo() {
+    public void redo() {
         if (redoStack.isEmpty()) {
             throw new IllegalArgumentException("nothing to redo");
         }

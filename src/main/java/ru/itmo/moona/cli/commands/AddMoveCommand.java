@@ -6,17 +6,18 @@ import ru.itmo.moona.domain.StockMove;
 import ru.itmo.moona.domain.StockMoveType;
 import ru.itmo.moona.cli.base.Command;
 import ru.itmo.moona.cli.base.InputParser;
-
-import static ru.itmo.moona.service.StockManager.*;
+import ru.itmo.moona.service.StockUtils;
 
 import java.util.Scanner;
 
 public class AddMoveCommand implements Command, Undoable {
     private final Scanner scanner;
     private StockMove createdMove;
+    private final StockManager manager;
 
-    public AddMoveCommand(Scanner scanner) {
+    public AddMoveCommand(Scanner scanner, StockManager manager) {
         this.scanner = scanner;
+        this.manager = manager;
     }
 
     @Override
@@ -25,21 +26,21 @@ public class AddMoveCommand implements Command, Undoable {
             throw new IllegalArgumentException("expected a batch ID");
         } else {
             StockMove.MoveBuilder builder = new StockMove.MoveBuilder();
-            builder.setId(genMoveId());
+            builder.setId(manager.genMoveId());
             builder.setCreatedAt();
             builder.setOwnerUsername("SYSTEM");
             String idInput = input.getArg();
 
             try {
                 long id = Long.parseLong(idInput);
-                if (!isBatchExists(id)) {
+                if (!manager.batchExists(id)) {
                     throw new IllegalArgumentException("this batch doesn't exist.");
                 }
-                if (StockManager.isBatchArchived(id)) {
+                if (manager.isBatchArchived(id)) {
                     throw new IllegalArgumentException("you can't move an archived batch");
                 } else {
                     builder.setBatchId(id);
-                    builder.setUnit();
+                    builder.setUnit(manager.setMoveUnit(id));
                 }
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException("invalid id. expected a number");
@@ -100,11 +101,11 @@ public class AddMoveCommand implements Command, Undoable {
             try {
                 createdMove = builder.build();
                 if (createdMove.getType() == StockMoveType.IN) {
-                    moveIn(createdMove);
+                    manager.moveIn(createdMove);
                 } else {
-                    moveOutDiscard(createdMove);
+                    manager.moveOutDiscard(createdMove);
                 }
-                addMove(createdMove);
+                manager.addMove(createdMove);
                 System.out.println("successfully applied move " + createdMove.getId());
             } catch (IllegalArgumentException e) {
                 System.err.println("oops! " + e.getMessage());
@@ -127,11 +128,11 @@ public class AddMoveCommand implements Command, Undoable {
         if (createdMove == null) {
             throw new IllegalArgumentException("there is no created move. can't undo");
         }
-        removeMove(createdMove);
+        manager.removeMove(createdMove);
         if (createdMove.getType() == StockMoveType.IN) {
-            moveOutDiscard(createdMove);
+            manager.moveOutDiscard(createdMove);
         } else {
-            moveIn(createdMove);
+            manager.moveIn(createdMove);
         }
         System.out.println("move " + createdMove.getId() + " has been removed.");
 
@@ -142,12 +143,12 @@ public class AddMoveCommand implements Command, Undoable {
         if (createdMove == null) {
             throw new IllegalArgumentException("there is no created move. can't redo.");
         }
-        if (!isMoveExists(createdMove.getId())) {
-            redoMove(createdMove);
+        if (!manager.moveExists(createdMove.getId())) {
+            manager.redoMove(createdMove);
             if (createdMove.getType() == StockMoveType.IN) {
-                moveIn(createdMove);
+                manager.moveIn(createdMove);
             } else {
-                moveOutDiscard(createdMove);
+                manager.moveOutDiscard(createdMove);
             }
             System.out.println("move " + createdMove.getId() + " has been re-added.");
         } else {

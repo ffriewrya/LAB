@@ -6,6 +6,12 @@ import ru.itmo.moona.domain.ReagentBatch;
 import ru.itmo.moona.service.StockManager;
 
 public class BatchHistoryCommand implements Command {
+    private final StockManager manager;
+
+    public BatchHistoryCommand(StockManager manager) {
+        this.manager = manager;
+    }
+
     @Override
     public void execute(InputParser input) {
         try {
@@ -13,8 +19,8 @@ public class BatchHistoryCommand implements Command {
                 throw new IllegalArgumentException("expected a batch ID.");
             }
             long id = Long.parseLong(input.getArg());
-            ReagentBatch batch = StockManager.getBatch(id);
-            StockManager.printHistory(batch);
+            ReagentBatch batch = manager.getBatch(id);
+            manager.printHistory(batch);
         } catch (NumberFormatException e) {
             System.err.println("invalid id. expected a number");
         } catch (IllegalArgumentException e) {

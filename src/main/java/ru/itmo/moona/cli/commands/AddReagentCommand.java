@@ -8,22 +8,22 @@ import ru.itmo.moona.cli.base.InputParser;
 
 import java.util.Scanner;
 
-import static ru.itmo.moona.service.StockManager.*;
-
 public class AddReagentCommand implements Command, Undoable {
 
     private final Scanner scanner;
     private Reagent createdReagent;
+    private final StockManager manager;
 
-    public AddReagentCommand(Scanner scanner) {
+    public AddReagentCommand(Scanner scanner, StockManager manager) {
         this.scanner = scanner;
+        this.manager = manager;
     }
 
     @Override
     public void execute(InputParser input) {
 
         Reagent.ReagentBuilder builder = new Reagent.ReagentBuilder();
-        builder.setId(genReagentId());
+        builder.setId(manager.genReagentId());
         builder.setCreatedAt();
         builder.setUpdatedAt();
         builder.setOwnerUsername("SYSTEM");
@@ -71,7 +71,7 @@ public class AddReagentCommand implements Command, Undoable {
         }
 
         createdReagent = builder.build();
-        addReagent(createdReagent);
+        manager.addReagent(createdReagent);
         System.out.println("successfully added a reagent " + createdReagent.getId());
 
 
@@ -92,7 +92,7 @@ public class AddReagentCommand implements Command, Undoable {
         if (createdReagent == null) {
             throw new IllegalArgumentException("there is no created reagent. can't undo.");
         }
-        removeReagent(createdReagent);
+        manager.removeReagent(createdReagent);
         System.out.println("successfully removed reagent " + createdReagent.getId());
     }
 
@@ -101,8 +101,8 @@ public class AddReagentCommand implements Command, Undoable {
         if (createdReagent == null) {
             throw new IllegalArgumentException("there is no created reagent. can't redo.");
         }
-        if (!isReagentExists(createdReagent.getId())) {
-            StockManager.redoReagent(createdReagent);
+        if (!manager.reagentExists(createdReagent.getId())) {
+            manager.redoReagent(createdReagent);
             System.out.println("reagent " + createdReagent.getId() + " has been re-added.");
         } else {
             throw new IllegalArgumentException("reagent already exists. can't redo.");

@@ -1,166 +1,120 @@
 package ru.itmo.moona.service;
 
 import ru.itmo.moona.domain.*;
-
+import ru.itmo.moona.storage.StockSnapshot;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
 public class StockManager {
-    private static final HashMap<Long, Reagent> reagents = new HashMap<>();
-    private static final HashMap<Long, ReagentBatch> batches = new HashMap<>();
-    private static final HashMap<Long, StockMove> moves = new HashMap<>();
-    private static Long reagentId = 0L;
-    private static Long batchId = 0L;
-    private static Long moveId = 0L;
+    private final HashMap<Long, Reagent> reagents = new HashMap<>();
+    private final HashMap<Long, ReagentBatch> batches = new HashMap<>();
+    private final HashMap<Long, StockMove> moves = new HashMap<>();
+    private Long reagentId = 0L;
+    private Long batchId = 0L;
+    private Long moveId = 0L;
 
-    public static Long genReagentId() {
+    public Long genReagentId() {
         Long generatedId = 1L + reagentId;
         return generatedId;
     }
 
-    public static Long genBatchId() {
+    public Long genBatchId() {
         Long generatedId = 1L + batchId;
         return generatedId;
     }
 
-    public static Long genMoveId() {
+    public Long genMoveId() {
         Long generatedId = 1L + moveId;
         return generatedId;
     }
 
-    public static void addBatch(ReagentBatch b) {
+    public void addBatch(ReagentBatch b) {
         batches.put(b.getId(), b);
         batchId++;
     }
 
-    public static void addReagent(Reagent r) {
+    public void addReagent(Reagent r) {
         reagents.put(r.getId(), r);
         reagentId++;
     }
 
-    public static void addMove(StockMove m) {
+    public void addMove(StockMove m) {
         moves.put(m.getId(), m);
         update(batches.get(m.getBatchId()));
         moveId++;
     }
 
-    public static boolean isReagentExists(long idToCheck) {
-        return reagents.containsKey(idToCheck);
-    }
-
-    public static boolean isBatchExists(long idToCheck) {
-        return batches.containsKey(idToCheck);
-    }
-
-    public static boolean isMoveExists(long idToCheck) {
-        return moves.containsKey(idToCheck);
-    }
-
-    public static BatchUnit findUnit(String unit) {
-        for (BatchUnit bu : BatchUnit.values()) {
-            if (bu.name().equalsIgnoreCase(unit)) {
-                return bu;
-            }
-        }
-        throw new IllegalArgumentException("invalid unit. expected G or ML.");
-
-    }
-
-    public static BatchStatus findStatus(String status) {
-        for (BatchStatus bs : BatchStatus.values()) {
-            if (bs.name().equalsIgnoreCase(status)) {
-                return bs;
-            }
-        }
-        throw new IllegalArgumentException("invalid status. expected ACTIVE or ARCHIVED.");
-
-    }
-
-    public static StockMoveType findType(String type) {
-        for (StockMoveType mt : StockMoveType.values()) {
-            if (mt.name().equalsIgnoreCase(type)) {
-                return mt;
-            }
-        }
-        throw new IllegalArgumentException("invalid type. expected IN, OUT or DISCARD.");
-    }
-
-    public static BatchUnit setMoveUnit(long batchId) {
+    public BatchUnit setMoveUnit(long batchId) {
         BatchUnit unit = batches.get(batchId).getUnit();
         return unit;
     }
 
-    public static HashMap<Long, Reagent> getReagents() {
+    public boolean isUnitValid(StockMove m) {
+        if (m.getUnit() == setMoveUnit(m.getBatchId())) {
+            return true;
+        }
+        return false;
+    }
+
+    public HashMap<Long, Reagent> getReagents() {
         return reagents;
     }
 
-    public static HashMap<Long, ReagentBatch> getBatches() {
+    public HashMap<Long, ReagentBatch> getBatches() {
         return batches;
     }
 
+    public HashMap<Long, StockMove> getMoves() {
+        return moves;
+    }
 
-    public static void update(Reagent r) {
+    public void update(Reagent r) {
         r.setUpdatedAt(Instant.now());
     }
 
-    public static void update(ReagentBatch b) {
+    public void update(ReagentBatch b) {
         b.setUpdatedAt(Instant.now());
     }
 
-    public static void update(StockMove m) {
+    public void update(StockMove m) {
         m.setMovedAt(Instant.now());
     }
 
-    private static void printReagTemplate() {
+    private void printReagTemplate() {
         System.out.printf("%-4s %-20s %-10s %-15s %-15s %-15s %-25s %-25s", "ID", "Name", "Formula", "CAS", "Hazard Class", "Owner", "Created at", "Updated at");
         System.out.println();
     }
 
-    private static void printBatchTemplate() {
+    private void printBatchTemplate() {
         System.out.printf("%-4s %-10s %-15s %-10s %-10s %-15s %-15s %-10s %-15s %-25s %-25s", "ID", "Reagent", "Label", "Quantity", "Unit", "Location", "Expires at", "Status", "Owner", "Created at", "Updated at");
         System.out.println();
     }
 
-    private static void printMoveTemplate() {
+    private void printMoveTemplate() {
         System.out.printf("%-4s %-10s %-15s %-10s %-10s %-15s %-15s %-15s %-25s", "ID", "Batch", "Type", "Quantity", "Unit", "Reason", "Owner", "Moved at", "Created at");
         System.out.println();
     }
 
-    public static void printReagents() {
+    public void printReagents() {
         printReagTemplate();
         reagents.values().forEach(System.out::println);
     }
 
-    public static void printBatches() {
+    public void printBatches() {
         printBatchTemplate();
         batches.values().forEach(System.out::println);
     }
 
-    public static void printMoves() {
+    public void printMoves() {
         printMoveTemplate();
         moves.values().forEach(System.out::println);
     }
 
-    public static Instant parseDate(String date) {
-        try {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
-            LocalDate localDate = LocalDate.parse(date, formatter);
-            LocalDateTime localDateTime = localDate.atStartOfDay();
-            Instant finalDate = localDateTime.atZone(ZoneId.systemDefault()).toInstant();
-            return finalDate;
-        } catch (DateTimeParseException e) {
-            throw new IllegalArgumentException("invalid date. expected dd-MM-yyyy");
-        }
-    }
 
-    public static void findReagent(String name) {
+    public void findReagent(String name) {
         List<Reagent> result = new ArrayList<>();
         for (Reagent reagent : reagents.values()) {
             if (reagent.getName().toLowerCase().contains(name.toLowerCase())) {
@@ -175,7 +129,7 @@ public class StockManager {
         }
     }
 
-    public static void findBatch(long id) {
+    public void findBatch(long id) {
         List<ReagentBatch> result = new ArrayList<>();
         for (ReagentBatch batch : batches.values()) {
             if (batch.getReagentId() == id) {
@@ -190,7 +144,7 @@ public class StockManager {
         }
     }
 
-    public static void findActiveBatch(long id) {
+    public void findActiveBatch(long id) {
         List<ReagentBatch> result = new ArrayList<>();
         for (ReagentBatch batch : batches.values()) {
             if (batch.getReagentId() == id && batch.getStatus() == BatchStatus.ACTIVE) {
@@ -205,8 +159,8 @@ public class StockManager {
         }
     }
 
-    public static void showBatch(long id) {
-        if (isBatchExists(id)) {
+    public void showBatch(long id) {
+        if (batchExists(id)) {
             ReagentBatch batch = batches.get(id);
             printBatchTemplate();
             System.out.println(batch);
@@ -215,7 +169,7 @@ public class StockManager {
         }
     }
 
-    public static void showMoves(long id) {
+    public void showMoves(long id) {
         List<StockMove> result = new ArrayList<>();
         for (StockMove move : moves.values()) {
             if (move.getBatchId() == id) {
@@ -230,7 +184,7 @@ public class StockManager {
         }
     }
 
-    public static void showAmountOfMoves(long id, int amount) {
+    public void showAmountOfMoves(long id, int amount) {
         List<StockMove> result = new ArrayList<>();
         for (StockMove move : moves.values()) {
             if (move.getBatchId() == id) {
@@ -248,13 +202,13 @@ public class StockManager {
         }
     }
 
-    public static void archiveBatch(long id) {
-        if (isBatchExists(id)) {
+    public void archiveBatch(long id) {
+        if (batchExists(id)) {
             ReagentBatch b = batches.get(id);
             if (b.getStatus() == BatchStatus.ARCHIVED) {
                 throw new IllegalArgumentException("this batch is already archived.");
             } else {
-                b.setStatus("ARCHIVED");
+                b.setStatus(BatchStatus.ARCHIVED);
                 System.out.println("batch " + id + " now is archived.");
             }
         } else {
@@ -262,7 +216,7 @@ public class StockManager {
         }
     }
 
-    public static void stockReport() {
+    public void stockReport() {
         System.out.println("Reagents:");
         printReagents();
         System.out.println("Batches:");
@@ -271,9 +225,9 @@ public class StockManager {
         printMoves();
     }
 
-    public static void stockReport(String date) {
+    public void stockReport(String date) {
         try {
-            Instant targetDate = parseDate(date);
+            Instant targetDate = StockUtils.parseDate(date);
             List<ReagentBatch> result = new ArrayList<>();
             for (ReagentBatch b : batches.values()) {
                 if (b.getExpiresAt().isBefore(targetDate)) {
@@ -292,7 +246,7 @@ public class StockManager {
         }
     }
 
-    public static void moveIn(StockMove move) {
+    public void moveIn(StockMove move) {
         ReagentBatch batch = batches.get(move.getBatchId());
         double quantity = move.getQuantity();
         double currentQuantity = batch.getQuantityCurrent();
@@ -300,7 +254,7 @@ public class StockManager {
         batch.addMemento(batch.createMemento());
     }
 
-    public static void moveOutDiscard(StockMove move) {
+    public void moveOutDiscard(StockMove move) {
         ReagentBatch batch = batches.get(move.getBatchId());
         double quantity = move.getQuantity();
         double currentQuantity = batch.getQuantityCurrent();
@@ -312,7 +266,7 @@ public class StockManager {
         }
     }
 
-    public static boolean isBatchArchived(long id) {
+    public boolean isBatchArchived(long id) {
         if (batches.get(id).getStatus() == BatchStatus.ARCHIVED) {
             return true;
         } else {
@@ -320,63 +274,63 @@ public class StockManager {
         }
     }
 
-    public static void updLocation(long id, String location) {
+    public void updLocation(long id, String location) {
         ReagentBatch batch = batches.get(id);
         batch.setLocation(location);
         update(batch);
     }
 
-    public static void updExpiresAt(long id, String date) {
+    public void updExpiresAt(long id, String date) {
         ReagentBatch batch = batches.get(id);
-        batch.setExpiresAt(parseDate(date));
+        batch.setExpiresAt(StockUtils.parseDate(date));
         update(batch);
     }
 
-    public static void updStatus(long id, String status) {
+    public void updStatus(long id, String status) {
         ReagentBatch batch = batches.get(id);
-        batch.setStatus(status);
+        batch.setStatus(StockUtils.findStatus(status));
         update(batch);
     }
 
-    public static void updLabel(long id, String label) {
+    public void updLabel(long id, String label) {
         ReagentBatch batch = batches.get(id);
         batch.setLabel(label);
         update(batch);
     }
 
-    public static void removeReagent(Reagent r) {
+    public void removeReagent(Reagent r) {
         reagents.remove(r.getId());
     }
 
-    public static void redoReagent(Reagent r) {
+    public void redoReagent(Reagent r) {
         reagents.put(r.getId(), r);
     }
 
-    public static void removeBatch(ReagentBatch b) {
+    public void removeBatch(ReagentBatch b) {
         batches.remove(b.getId());
     }
 
-    public static void redoBatch(ReagentBatch b) {
+    public void redoBatch(ReagentBatch b) {
         batches.put(b.getId(), b);
     }
 
-    public static void removeMove(StockMove m) {
+    public void removeMove(StockMove m) {
         moves.remove(m.getId());
     }
 
-    public static void redoMove(StockMove m) {
+    public void redoMove(StockMove m) {
         moves.put(m.getId(), m);
     }
 
-    public static ReagentBatch getBatch(long id) {
-        if (isBatchExists(id)) {
+    public ReagentBatch getBatch(long id) {
+        if (batchExists(id)) {
             return batches.get(id);
         } else {
             throw new IllegalArgumentException("invalid id. haven't found any batches");
         }
     }
 
-    public static void printHistory(ReagentBatch batch) {
+    public void printHistory(ReagentBatch batch) {
         List<ReagentBatch.BatchMemento> history = batch.getHistory();
         System.out.printf("%-10s %-15s %-10s %-10s %-15s %-15s %-10s %-15s %-25s %-25s", "Reagent", "Label", "Quantity", "Unit", "Location", "Expires at", "Status", "Owner", "Created at", "Updated at");
         for (int i = 0; i < history.size(); i++) {
@@ -386,11 +340,25 @@ public class StockManager {
     }
 
 
-    public static DateTimeFormatter formatterExp = DateTimeFormatter.ofPattern("d.MM.yyyy")
-            .withZone(ZoneId.systemDefault());
+    public boolean reagentExists(long idToCheck) {
+        return reagents.containsKey(idToCheck);
+    }
 
+    public boolean batchExists(long idToCheck) {
+        return batches.containsKey(idToCheck);
+    }
 
-    public static DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE, d.MM.yyyy HH:mm:ss")
-            .withZone(ZoneId.systemDefault());
+    public boolean moveExists(long idToCheck) {
+        return moves.containsKey(idToCheck);
+    }
+
+    public void loadStock(StockSnapshot s) {
+        reagents.clear();
+        reagents.putAll(s.getRgs());
+        batches.clear();
+        batches.putAll(s.getBchs());
+        moves.clear();
+        moves.putAll(s.getMvs());
+    }
 }
 

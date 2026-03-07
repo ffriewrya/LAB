@@ -1,6 +1,10 @@
 package ru.itmo.moona.domain;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ru.itmo.moona.service.StockManager;
+import ru.itmo.moona.service.StockUtils;
 
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
@@ -9,8 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-import static ru.itmo.moona.service.StockManager.*;
-
+@JsonAutoDetect
 public final class ReagentBatch {
     private long id;
     private long reagentId;
@@ -23,6 +26,9 @@ public final class ReagentBatch {
     private String ownerUsername;
     private Instant createdAt;
     private Instant updatedAt;
+
+    private ReagentBatch() {
+    }
 
     private final List<BatchMemento> history = new ArrayList<>();
 
@@ -44,16 +50,16 @@ public final class ReagentBatch {
         return id;
     }
 
+    public void setId(long id) {
+        this.id = id;
+    }
+
     public long getReagentId() {
         return reagentId;
     }
 
     public void setReagentId(long reagentId) {
-        if (StockManager.isReagentExists(reagentId)) {
-            this.reagentId = reagentId;
-        } else {
-            throw new IllegalArgumentException("reagentId doesn't exist");
-        }
+        this.reagentId = reagentId;
     }
 
     public String getLabel() {
@@ -61,11 +67,7 @@ public final class ReagentBatch {
     }
 
     public void setLabel(String label) {
-        if (label == null || label.isBlank() || label.length() > 64) {
-            throw new IllegalArgumentException("label can't be null or have a length exceeding 64 characters.");
-        } else {
-            this.label = label;
-        }
+        this.label = label;
     }
 
     public double getQuantityCurrent() {
@@ -73,11 +75,7 @@ public final class ReagentBatch {
     }
 
     public void setQuantityCurrent(double quantityCurrent) {
-        if (quantityCurrent < 0) {
-            throw new IllegalArgumentException("current quantity can't be negative");
-        } else {
-            this.quantityCurrent = quantityCurrent;
-        }
+        this.quantityCurrent = quantityCurrent;
     }
 
     public BatchUnit getUnit() {
@@ -93,11 +91,7 @@ public final class ReagentBatch {
     }
 
     public void setLocation(String location) {
-        if (location == null || location.isBlank() || location.length() > 64) {
-            throw new IllegalArgumentException("location can't be blank or have a length exceeding 64 characters.");
-        } else {
-            this.location = location;
-        }
+        this.location = location;
     }
 
     public Instant getExpiresAt() {
@@ -112,12 +106,8 @@ public final class ReagentBatch {
         return status;
     }
 
-    public List<BatchMemento> getHistory() {
-        return history;
-    }
-
-    public void setStatus(String status) {
-        this.status = StockManager.findStatus(status);
+    public void setStatus(BatchStatus status) {
+        this.status = status;
     }
 
     public String getOwnerUsername() {
@@ -132,12 +122,20 @@ public final class ReagentBatch {
         return createdAt;
     }
 
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public Instant getUpdatedAt() {
         return updatedAt;
     }
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public List<BatchMemento> getHistory() {
+        return history;
     }
 
     @Override
@@ -155,7 +153,12 @@ public final class ReagentBatch {
 
     @Override
     public String toString() {
-        return String.format("%-4s %-10s %-15s %-10s %-10s %-15s %-15s %-10s %-15s %-25s %-25s", id, reagentId, label, quantityCurrent, unit, location, formatterExp.format(expiresAt), status, ownerUsername, formatter.format(createdAt), formatter.format(updatedAt));
+        return String.format("%-4s %-10s %-15s %-10s %-10s %-15s %-15s %-10s %-15s %-25s %-25s", id, reagentId, label, quantityCurrent, unit, location, StockUtils.formatterExp.format(expiresAt), status, ownerUsername, StockUtils.formatter.format(createdAt), StockUtils.formatter.format(updatedAt));
+    }
+
+    @JsonIgnore
+    public boolean isValid() {
+        return label != null && !label.isBlank() && label.length() <= 64 && quantityCurrent >= 0 &&  location != null && !location.isBlank() && location.length() <= 64 && expiresAt != null && unit != null && updatedAt != null && createdAt != null && ownerUsername != null;
     }
 
     public static class BatchBuilder {
@@ -178,12 +181,8 @@ public final class ReagentBatch {
         }
 
         public BatchBuilder setReagentId(long reagentId) {
-            if (StockManager.isReagentExists(reagentId)) {
                 this.reagentId = reagentId;
                 return this;
-            } else {
-                throw new IllegalArgumentException("reagentId doesn't exist");
-            }
         }
 
         public BatchBuilder setLabel(String label) {
@@ -205,7 +204,7 @@ public final class ReagentBatch {
         }
 
         public BatchBuilder setUnit(String unit) {
-            this.unit = StockManager.findUnit(unit);
+            this.unit = StockUtils.findUnit(unit);
             return this;
         }
 
@@ -224,7 +223,7 @@ public final class ReagentBatch {
                 return this;
             }
             try {
-                this.expiresAt = parseDate(expiresAt);
+                this.expiresAt = StockUtils.parseDate(expiresAt);
                 return this;
             } catch (DateTimeParseException e) {
                 throw new IllegalArgumentException("invalid expiration date. expected dd-MM-yyyy");
@@ -232,7 +231,7 @@ public final class ReagentBatch {
         }
 
         public BatchBuilder setStatus(String status) {
-            this.status = StockManager.findStatus(status);
+            this.status = StockUtils.findStatus(status);
             return this;
         }
 
@@ -285,6 +284,7 @@ public final class ReagentBatch {
         this.updatedAt = m.updatedAt;
     }
 
+    @JsonAutoDetect
     public static class BatchMemento {
         private long reagentId;
         private String label;
@@ -297,6 +297,8 @@ public final class ReagentBatch {
         private Instant createdAt;
         private Instant updatedAt;
 
+        private BatchMemento() {
+        }
 
         private BatchMemento(long reagentId, String label, double quantityCurrent, BatchUnit unit, String location, Instant expiresAt, BatchStatus status, String ownerUsername, Instant createdAt, Instant updatedAt) {
             this.reagentId = reagentId;
@@ -311,9 +313,89 @@ public final class ReagentBatch {
             this.updatedAt = updatedAt;
         }
 
+        public long getReagentId() {
+            return reagentId;
+        }
+
+        public void setReagentId(long reagentId) {
+            this.reagentId = reagentId;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+
+        public void setLabel(String label) {
+            this.label = label;
+        }
+
+        public double getQuantityCurrent() {
+            return quantityCurrent;
+        }
+
+        public void setQuantityCurrent(double quantityCurrent) {
+            this.quantityCurrent = quantityCurrent;
+        }
+
+        public BatchUnit getUnit() {
+            return unit;
+        }
+
+        public void setUnit(BatchUnit unit) {
+            this.unit = unit;
+        }
+
+        public String getLocation() {
+            return location;
+        }
+
+        public void setLocation(String location) {
+            this.location = location;
+        }
+
+        public Instant getExpiresAt() {
+            return expiresAt;
+        }
+
+        public void setExpiresAt(Instant expiresAt) {
+            this.expiresAt = expiresAt;
+        }
+
+        public BatchStatus getStatus() {
+            return status;
+        }
+
+        public void setStatus(BatchStatus status) {
+            this.status = status;
+        }
+
+        public String getOwnerUsername() {
+            return ownerUsername;
+        }
+
+        public void setOwnerUsername(String ownerUsername) {
+            this.ownerUsername = ownerUsername;
+        }
+
+        public Instant getCreatedAt() {
+            return createdAt;
+        }
+
+        public void setCreatedAt(Instant createdAt) {
+            this.createdAt = createdAt;
+        }
+
+        public Instant getUpdatedAt() {
+            return updatedAt;
+        }
+
+        public void setUpdatedAt(Instant updatedAt) {
+            this.updatedAt = updatedAt;
+        }
+
         @Override
         public String toString() {
-            return String.format("%-10s %-15s %-10s %-10s %-15s %-15s %-10s %-15s %-25s %-25s", reagentId, label, quantityCurrent, unit, location, formatterExp.format(expiresAt), status, ownerUsername, formatter.format(createdAt), formatter.format(updatedAt));
+            return String.format("%-10s %-15s %-10s %-10s %-15s %-15s %-10s %-15s %-25s %-25s", reagentId, label, quantityCurrent, unit, location, StockUtils.formatterExp.format(expiresAt), status, ownerUsername, StockUtils.formatter.format(createdAt), StockUtils.formatter.format(updatedAt));
         }
 
     }

@@ -10,10 +10,14 @@ import java.util.List;
 import java.util.Map;
 
 public class UpdateBatchCommand implements Command, Undoable {
-
+    private final StockManager manager;
     private long batchId;
     private ReagentBatch.BatchMemento oldMemento;
     private ReagentBatch.BatchMemento newMemento;
+
+    public UpdateBatchCommand(StockManager manager) {
+        this.manager = manager;
+    }
 
     @Override
     public void execute(InputParser input) {
@@ -22,30 +26,30 @@ public class UpdateBatchCommand implements Command, Undoable {
                 throw new IllegalArgumentException("expected a batch ID");
             }
             this.batchId = Long.parseLong(input.getArg());
-            this.oldMemento = StockManager.getBatches().get(batchId).createMemento();
+            this.oldMemento = manager.getBatches().get(batchId).createMemento();
             List<String> rawInput = input.getAdArgs();
             Map<String, String> parsedInput = InputParser.parseAdArgs(rawInput);
             for (String field : parsedInput.keySet()) {
                 switch (field.toLowerCase()) {
                     case "location":
-                        StockManager.updLocation(batchId, parsedInput.get(field));
+                        manager.updLocation(batchId, parsedInput.get(field));
                         System.out.println("updated location to " + parsedInput.get(field));
                         break;
                     case "expiresat":
-                        StockManager.updExpiresAt(batchId, parsedInput.get(field));
+                        manager.updExpiresAt(batchId, parsedInput.get(field));
                         System.out.println("updated expires at to " + parsedInput.get(field));
                         break;
                     case "status":
-                        StockManager.updStatus(batchId, parsedInput.get(field));
+                        manager.updStatus(batchId, parsedInput.get(field));
                         System.out.println("updated status to " + parsedInput.get(field));
                         break;
                     case "label":
-                        StockManager.updLabel(batchId, parsedInput.get(field));
+                        manager.updLabel(batchId, parsedInput.get(field));
                         System.out.println("updated label to " + parsedInput.get(field));
                         break;
                 }
             }
-            ReagentBatch batch = StockManager.getBatch(batchId);
+            ReagentBatch batch = manager.getBatch(batchId);
             this.newMemento = batch.createMemento();
             batch.addMemento(newMemento);
         } catch (NumberFormatException e) {
@@ -70,7 +74,7 @@ public class UpdateBatchCommand implements Command, Undoable {
         if (oldMemento == null) {
             throw new IllegalArgumentException("there is no previous state. can't undo");
         }
-        StockManager.getBatch(batchId).restoreFromMemento(oldMemento);
+        manager.getBatch(batchId).restoreFromMemento(oldMemento);
         System.out.println("batch " + this.batchId + " state has been restored.");
     }
 
@@ -79,7 +83,7 @@ public class UpdateBatchCommand implements Command, Undoable {
         if (newMemento == null) {
             throw new IllegalArgumentException("there is no new state. can't redo");
         }
-        StockManager.getBatch(batchId).restoreFromMemento(newMemento);
+        manager.getBatch(batchId).restoreFromMemento(newMemento);
         System.out.println("batch " + this.batchId + " state has been redone.");
     }
 }

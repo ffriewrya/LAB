@@ -5,6 +5,12 @@ import ru.itmo.moona.cli.base.Command;
 import ru.itmo.moona.cli.base.InputParser;
 
 public class BatchShowCommand implements Command {
+    private final StockManager manager;
+
+    public BatchShowCommand(StockManager manager) {
+        this.manager = manager;
+    }
+
     @Override
     public void execute(InputParser input) {
         try {
@@ -12,7 +18,7 @@ public class BatchShowCommand implements Command {
                 throw new IllegalArgumentException("expected batch ID");
             } else {
                 long id = Long.parseLong(input.getArg());
-                StockManager.showBatch(id);
+                manager.showBatch(id);
             }
         } catch (NumberFormatException e) {
             System.err.println("invalid id. expected a number");

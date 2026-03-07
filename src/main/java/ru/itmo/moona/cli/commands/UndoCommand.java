@@ -5,9 +5,15 @@ import ru.itmo.moona.cli.base.CommandManager;
 import ru.itmo.moona.cli.base.InputParser;
 
 public class UndoCommand implements Command {
+    private final CommandManager manager;
+
+    public UndoCommand(CommandManager manager) {
+        this.manager = manager;
+    }
+
     @Override
     public void execute(InputParser input) {
-        CommandManager.undo();
+        manager.undo();
     }
 
     @Override

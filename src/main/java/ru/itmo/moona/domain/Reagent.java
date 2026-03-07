@@ -1,19 +1,21 @@
 package ru.itmo.moona.domain;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import ru.itmo.moona.service.StockUtils;
+
 import java.time.Instant;
 import java.util.Objects;
 
-import static ru.itmo.moona.service.StockManager.*;
-
+@JsonAutoDetect
 public final class Reagent {
-
-    private final long id;
+    private long id;
     private String name;
     private String formula;
     private String cas;
     private String hazardClass;
     private String ownerUsername;
-    private final Instant createdAt;
+    private Instant createdAt;
     private Instant updatedAt;
 
     private Reagent(ReagentBuilder reagentBuilder) {
@@ -27,8 +29,15 @@ public final class Reagent {
         this.updatedAt = reagentBuilder.updatedAt;
     }
 
+    private Reagent() {
+    }
+
     public long getId() {
         return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -36,11 +45,7 @@ public final class Reagent {
     }
 
     public void setName(String name) {
-        if (name == null || name.isEmpty() || name.isBlank() || name.length() >= 128) {
-            throw new IllegalArgumentException("name can't be null or have a length exceeding 128 characters.");
-        } else {
-            this.name = name;
-        }
+        this.name = name;
     }
 
     public String getFormula() {
@@ -48,11 +53,7 @@ public final class Reagent {
     }
 
     public void setFormula(String formula) {
-        if (formula != null && formula.length() > 32) {
-            throw new IllegalArgumentException("formula can't be null or have a length exceeding 32 characters.");
-        } else {
-            this.formula = formula;
-        }
+        this.formula = formula;
     }
 
     public String getCas() {
@@ -60,11 +61,7 @@ public final class Reagent {
     }
 
     public void setCas(String cas) {
-        if (cas != null && cas.length() > 32) {
-            throw new IllegalArgumentException("cas can't be null or have a length exceeding 32 characters.");
-        } else {
-            this.cas = cas;
-        }
+        this.cas = cas;
     }
 
     public String getHazardClass() {
@@ -72,11 +69,7 @@ public final class Reagent {
     }
 
     public void setHazardClass(String hazardClass) {
-        if (hazardClass != null && hazardClass.length() > 32) {
-            throw new IllegalArgumentException("hazard class can't be null or have a length exceeding 32 characters.");
-        } else {
-            this.hazardClass = hazardClass;
-        }
+        this.hazardClass = hazardClass;
     }
 
     public String getOwnerUsername() {
@@ -91,6 +84,10 @@ public final class Reagent {
         return createdAt;
     }
 
+    public void setCreatedAt(Instant createdAt) {
+        this.createdAt = createdAt;
+    }
+
     public Instant getUpdatedAt() {
         return updatedAt;
     }
@@ -99,10 +96,14 @@ public final class Reagent {
         this.updatedAt = updatedAt;
     }
 
+    @JsonIgnore
+    public boolean isValid() {
+        return name != null && !name.isBlank() && name.length() <= 128 && (formula == null || formula.length() <= 32) && (cas == null || cas.length() <= 32) && (hazardClass == null || hazardClass.length() <= 32) && updatedAt != null && createdAt != null && ownerUsername != null;
+    }
 
     @Override
     public String toString() {
-        return String.format("%-4s %-20s %-10s %-15s %-15s %-15s %-25s %-25s", id, name, formula, cas, hazardClass, ownerUsername, formatter.format(createdAt), formatter.format(updatedAt));
+        return String.format("%-4s %-20s %-10s %-15s %-15s %-15s %-25s %-25s", id, name, formula, cas, hazardClass, ownerUsername, StockUtils.formatter.format(createdAt), StockUtils.formatter.format(updatedAt));
     }
 
     @Override
@@ -170,7 +171,7 @@ public final class Reagent {
 
         public ReagentBuilder setFormula(String formula) {
             if (formula != null && formula.length() > 32) {
-                throw new IllegalArgumentException("formula can't be null or have a length exceeding 32 characters.");
+                throw new IllegalArgumentException("formula can't have a length exceeding 32 characters.");
             } else {
                 this.formula = formula;
                 return this;
@@ -179,7 +180,7 @@ public final class Reagent {
 
         public ReagentBuilder setCas(String cas) {
             if (cas != null && cas.length() > 32) {
-                throw new IllegalArgumentException("cas can't be null or have a length exceeding 32 characters.");
+                throw new IllegalArgumentException("cas can't have a length exceeding 32 characters.");
             } else {
                 this.cas = cas;
                 return this;
@@ -188,7 +189,7 @@ public final class Reagent {
 
         public ReagentBuilder setHazardClass(String hazardClass) {
             if (hazardClass != null && hazardClass.length() > 32) {
-                throw new IllegalArgumentException("hazard class can't be null or have a length exceeding 32 characters.");
+                throw new IllegalArgumentException("hazard class can't have a length exceeding 32 characters.");
             } else {
                 this.hazardClass = hazardClass;
                 return this;
