@@ -1,0 +1,11 @@
+package ru.itmo.moona.app;
+import javafx.application.Application;
+
+public class Main {
+    public static void main(String[] args) {
+        Application.launch(JavaFXApp.class, args);
+    }
+}
+
+
+
