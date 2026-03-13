@@ -3,6 +3,7 @@ package ru.itmo.moona.domain;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import ru.itmo.moona.service.StockManager;
 import ru.itmo.moona.service.StockUtils;
 
@@ -11,6 +12,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Objects;
 
 @JsonAutoDetect
+@JsonIgnoreProperties(ignoreUnknown = true)
 public final class StockMove {
     private long id;
     private long batchId;
@@ -22,7 +24,8 @@ public final class StockMove {
     private Instant movedAt;
     private Instant createdAt;
 
-    private StockMove() {}
+    private StockMove() {
+    }
 
     public long getId() {
         return id;
@@ -148,12 +151,12 @@ public final class StockMove {
         }
 
         public MoveBuilder setBatchId(long batchId) {
-                this.batchId = batchId;
-                return this;
+            this.batchId = batchId;
+            return this;
         }
 
-        public MoveBuilder setType(String type) {
-            this.type = StockUtils.findType(type);
+        public MoveBuilder setType(StockMoveType type) {
+            this.type = type;
             return this;
         }
 
@@ -190,13 +193,9 @@ public final class StockMove {
             return this;
         }
 
-        public MoveBuilder setMovedAt(String movedAt) {
-            try {
-                this.movedAt = StockUtils.parseDate(movedAt);
-                return this;
-            } catch (DateTimeParseException e) {
-                throw new IllegalArgumentException("invalid moving date. expected dd-MM-yyyy.");
-            }
+        public MoveBuilder setMovedAt(Instant movedAt) {
+            this.movedAt = movedAt;
+            return this;
         }
 
         public MoveBuilder setCreatedAt() {

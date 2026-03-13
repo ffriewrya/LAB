@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.itmo.moona.gui.BatchTableController">
+   <children>
+      <TableView fx:id="batchTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="781.0" prefWidth="1500.0">
+         <columns>
+            <TableColumn fx:id="batchIdCol" prefWidth="45.0" text="id" />
+            <TableColumn fx:id="batchReagentIdCol" prefWidth="100.0" text="reagent" />
+            <TableColumn fx:id="batchLabelCol" prefWidth="75.0" text="label" />
+            <TableColumn fx:id="batchQuantityCol" prefWidth="75.0" text="quantity" />
+            <TableColumn fx:id="batchUnitCol" prefWidth="60.0" text="unit" />
+            <TableColumn fx:id="batchLocationCol" prefWidth="75.0" text="location" />
+            <TableColumn fx:id="batchExpiresAtCol" prefWidth="100.0" text="expires at" />
+            <TableColumn fx:id="batchStatusCol" prefWidth="100.0" text="status" />
+            <TableColumn fx:id="batchOwnerUsernameCol" prefWidth="100.0" text="owner" />
+            <TableColumn fx:id="batchCreatedAtCol" prefWidth="100.0" text="created at" />
+            <TableColumn fx:id="batchUpdatedAtCol" prefWidth="100.0" text="updated at" />
+         </columns>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
+      </TableView>
+   </children>
+</AnchorPane>

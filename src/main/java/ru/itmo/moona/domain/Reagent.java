@@ -2,12 +2,14 @@ package ru.itmo.moona.domain;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import ru.itmo.moona.service.StockUtils;
 
 import java.time.Instant;
 import java.util.Objects;
 
 @JsonAutoDetect
+@JsonIgnoreProperties(ignoreUnknown = true)
 public final class Reagent {
     private long id;
     private String name;
@@ -103,7 +105,7 @@ public final class Reagent {
 
     @Override
     public String toString() {
-        return String.format("%-4s %-20s %-10s %-15s %-15s %-15s %-25s %-25s", id, name, formula, cas, hazardClass, ownerUsername, StockUtils.formatter.format(createdAt), StockUtils.formatter.format(updatedAt));
+        return name + " id: " + id;
     }
 
     @Override

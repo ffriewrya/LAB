@@ -5,6 +5,8 @@ import ru.itmo.moona.service.StockManager;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class FileStorage {
     private final ObjectMapper mapper;
@@ -22,6 +24,10 @@ public class FileStorage {
         } catch (IOException e) {
             throw new RuntimeException("unable to save data to file. ensure that the file is not open and the path is correct. " + e);
         }
+    }
+
+    public StockSnapshot save() {
+        return new StockSnapshot(manager.getReagents(), manager.getBatches(), manager.getMoves());
     }
 
     public StockSnapshot loadFromJson(String path) {

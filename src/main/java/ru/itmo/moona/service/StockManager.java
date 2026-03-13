@@ -2,11 +2,10 @@ package ru.itmo.moona.service;
 
 import ru.itmo.moona.domain.*;
 import ru.itmo.moona.storage.StockSnapshot;
+
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class StockManager {
     private final HashMap<Long, Reagent> reagents = new HashMap<>();
@@ -15,6 +14,18 @@ public class StockManager {
     private Long reagentId = 0L;
     private Long batchId = 0L;
     private Long moveId = 0L;
+
+    public void setReagentId(Long reagentId) {
+        this.reagentId = reagentId;
+    }
+
+    public void setBatchId(Long batchId) {
+        this.batchId = batchId;
+    }
+
+    public void setMoveId(Long moveId) {
+        this.moveId = moveId;
+    }
 
     public Long genReagentId() {
         Long generatedId = 1L + reagentId;
@@ -114,7 +125,7 @@ public class StockManager {
     }
 
 
-    public void findReagent(String name) {
+    public List<Reagent> findReagent(String name) {
         List<Reagent> result = new ArrayList<>();
         for (Reagent reagent : reagents.values()) {
             if (reagent.getName().toLowerCase().contains(name.toLowerCase())) {
@@ -124,12 +135,11 @@ public class StockManager {
         if (result.isEmpty()) {
             throw new IllegalArgumentException("haven't found any reagents.");
         } else {
-            printReagTemplate();
-            result.forEach(System.out::println);
+            return result;
         }
     }
 
-    public void findBatch(long id) {
+    public List<ReagentBatch> findBatch(long id) {
         List<ReagentBatch> result = new ArrayList<>();
         for (ReagentBatch batch : batches.values()) {
             if (batch.getReagentId() == id) {
@@ -139,12 +149,11 @@ public class StockManager {
         if (result.isEmpty()) {
             throw new IllegalArgumentException("haven't found any batches.");
         } else {
-            printBatchTemplate();
-            result.forEach(System.out::println);
+            return result;
         }
     }
 
-    public void findActiveBatch(long id) {
+    public List<ReagentBatch> findActiveBatch(long id) {
         List<ReagentBatch> result = new ArrayList<>();
         for (ReagentBatch batch : batches.values()) {
             if (batch.getReagentId() == id && batch.getStatus() == BatchStatus.ACTIVE) {
@@ -153,10 +162,20 @@ public class StockManager {
         }
         if (result.isEmpty()) {
             throw new IllegalArgumentException("haven't found any active batches.");
-        } else {
-            printBatchTemplate();
-            result.forEach(System.out::println);
         }
+        return result;
+    }
+    public List<ReagentBatch> findActiveBatches() {
+        List<ReagentBatch> result = new ArrayList<>();
+        for (ReagentBatch batch : batches.values()) {
+            if (batch.getStatus() == BatchStatus.ACTIVE) {
+                result.add(batch);
+            }
+        }
+        if (result.isEmpty()) {
+            throw new IllegalArgumentException("haven't found any active batches.");
+        }
+        return result;
     }
 
     public void showBatch(long id) {
@@ -169,7 +188,7 @@ public class StockManager {
         }
     }
 
-    public void showMoves(long id) {
+    public List<StockMove> showMoves(long id) {
         List<StockMove> result = new ArrayList<>();
         for (StockMove move : moves.values()) {
             if (move.getBatchId() == id) {
@@ -179,8 +198,7 @@ public class StockManager {
         if (result.isEmpty()) {
             throw new IllegalArgumentException("haven't found any moves.");
         } else {
-            printMoveTemplate();
-            result.forEach(System.out::println);
+            return result;
         }
     }
 
@@ -359,6 +377,11 @@ public class StockManager {
         batches.putAll(s.getBchs());
         moves.clear();
         moves.putAll(s.getMvs());
+
+
+        reagentId = reagents.isEmpty() ? 0L : Collections.max(reagents.keySet());
+        batchId = batches.isEmpty() ? 0L : Collections.max(batches.keySet());
+        moveId = moves.isEmpty()? 0L : Collections.max(moves.keySet());
     }
 }
 

@@ -1,20 +1,18 @@
 package ru.itmo.moona.domain;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import ru.itmo.moona.service.StockManager;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import ru.itmo.moona.service.StockUtils;
 
 import java.time.Instant;
-import java.time.format.DateTimeParseException;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @JsonAutoDetect
-public final class ReagentBatch {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public final class ReagentBatch implements Batchable {
     private long id;
     private long reagentId;
     private String label;
@@ -153,12 +151,12 @@ public final class ReagentBatch {
 
     @Override
     public String toString() {
-        return String.format("%-4s %-10s %-15s %-10s %-10s %-15s %-15s %-10s %-15s %-25s %-25s", id, reagentId, label, quantityCurrent, unit, location, StockUtils.formatterExp.format(expiresAt), status, ownerUsername, StockUtils.formatter.format(createdAt), StockUtils.formatter.format(updatedAt));
+        return label + " id: " + id;
     }
 
     @JsonIgnore
     public boolean isValid() {
-        return label != null && !label.isBlank() && label.length() <= 64 && quantityCurrent >= 0 &&  location != null && !location.isBlank() && location.length() <= 64 && expiresAt != null && unit != null && updatedAt != null && createdAt != null && ownerUsername != null;
+        return label != null && !label.isBlank() && label.length() <= 64 && quantityCurrent >= 0 && location != null && !location.isBlank() && location.length() <= 64 && expiresAt != null && unit != null && updatedAt != null && createdAt != null && ownerUsername != null;
     }
 
     public static class BatchBuilder {
@@ -181,8 +179,8 @@ public final class ReagentBatch {
         }
 
         public BatchBuilder setReagentId(long reagentId) {
-                this.reagentId = reagentId;
-                return this;
+            this.reagentId = reagentId;
+            return this;
         }
 
         public BatchBuilder setLabel(String label) {
@@ -203,8 +201,8 @@ public final class ReagentBatch {
             }
         }
 
-        public BatchBuilder setUnit(String unit) {
-            this.unit = StockUtils.findUnit(unit);
+        public BatchBuilder setUnit(BatchUnit unit) {
+            this.unit = unit;
             return this;
         }
 
@@ -217,21 +215,13 @@ public final class ReagentBatch {
             }
         }
 
-        public BatchBuilder setExpiresAt(String expiresAt) {
-            if (expiresAt == null || expiresAt.isBlank()) {
-                this.expiresAt = Instant.now().plus(365, ChronoUnit.DAYS);
-                return this;
-            }
-            try {
-                this.expiresAt = StockUtils.parseDate(expiresAt);
-                return this;
-            } catch (DateTimeParseException e) {
-                throw new IllegalArgumentException("invalid expiration date. expected dd-MM-yyyy");
-            }
+        public BatchBuilder setExpiresAt(Instant expiresAt) {
+            this.expiresAt = expiresAt;
+            return this;
         }
 
-        public BatchBuilder setStatus(String status) {
-            this.status = StockUtils.findStatus(status);
+        public BatchBuilder setStatus(BatchStatus status) {
+            this.status = status;
             return this;
         }
 
@@ -264,7 +254,7 @@ public final class ReagentBatch {
     }
 
     public BatchMemento createMemento() {
-        return new BatchMemento(this.reagentId, this.label, this.quantityCurrent, this.unit, this.location, this.expiresAt, this.status, this.ownerUsername, this.createdAt, this.updatedAt);
+        return new BatchMemento(this.id, this.reagentId, this.label, this.quantityCurrent, this.unit, this.location, this.expiresAt, this.status, this.ownerUsername, this.createdAt, this.updatedAt);
     }
 
     public void restoreStatusFromMemento(BatchMemento m) {
@@ -272,6 +262,7 @@ public final class ReagentBatch {
     }
 
     public void restoreFromMemento(BatchMemento m) {
+        this.id = m.id;
         this.reagentId = m.reagentId;
         this.label = m.label;
         this.quantityCurrent = m.quantityCurrent;
@@ -285,7 +276,8 @@ public final class ReagentBatch {
     }
 
     @JsonAutoDetect
-    public static class BatchMemento {
+    public static class BatchMemento implements Batchable {
+        private long id;
         private long reagentId;
         private String label;
         private double quantityCurrent;
@@ -300,7 +292,8 @@ public final class ReagentBatch {
         private BatchMemento() {
         }
 
-        private BatchMemento(long reagentId, String label, double quantityCurrent, BatchUnit unit, String location, Instant expiresAt, BatchStatus status, String ownerUsername, Instant createdAt, Instant updatedAt) {
+        private BatchMemento(long id, long reagentId, String label, double quantityCurrent, BatchUnit unit, String location, Instant expiresAt, BatchStatus status, String ownerUsername, Instant createdAt, Instant updatedAt) {
+            this.id = id;
             this.reagentId = reagentId;
             this.label = label;
             this.quantityCurrent = quantityCurrent;
@@ -311,6 +304,14 @@ public final class ReagentBatch {
             this.ownerUsername = ownerUsername;
             this.createdAt = createdAt;
             this.updatedAt = updatedAt;
+        }
+
+        public long getId() {
+            return id;
+        }
+
+        public void setId(long id) {
+            this.id = id;
         }
 
         public long getReagentId() {

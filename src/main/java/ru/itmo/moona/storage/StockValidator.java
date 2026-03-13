@@ -3,8 +3,6 @@ package ru.itmo.moona.storage;
 import ru.itmo.moona.domain.Reagent;
 import ru.itmo.moona.domain.ReagentBatch;
 import ru.itmo.moona.domain.StockMove;
-import ru.itmo.moona.service.StockManager;
-
 import java.util.HashMap;
 
 public class StockValidator {
@@ -39,23 +37,29 @@ public class StockValidator {
             validateRId(s.getRgs());
             s.getRgs().forEach((id, r) -> {
                 if (!r.isValid()) {
-                    throw new IllegalArgumentException("invalid reagents");
+                    throw new IllegalArgumentException("invalid reagent " + r.getId());
                 }
             });
         }
         if (!s.getBchs().isEmpty()) {
             validateBId(s.getBchs());
             s.getBchs().forEach((id, b) -> {
-                if (!b.isValid() || !s.getRgs().containsKey(b.getReagentId())) {
+                if (!b.isValid()) {
                     throw new IllegalArgumentException("invalid batches");
+                }
+                if (!s.getRgs().containsKey(b.getReagentId())) {
+                    throw new IllegalArgumentException("invalid batch " + b.getId() + ". reagentId doesn't exist.");
                 }
             });
         }
         if (!s.getMvs().isEmpty()) {
             validateMId(s.getMvs());
             s.getMvs().forEach((id, m) -> {
-                if (!m.isValid() || !s.getBchs().containsKey(m.getBatchId())) {
-                    throw new IllegalArgumentException("invalid reagents");
+                if (!m.isValid()) {
+                    throw new IllegalArgumentException("invalid move " + m.getId());
+                }
+                if (!s.getBchs().containsKey(m.getBatchId())) {
+                    throw new IllegalArgumentException("invalid move " + m.getId() + ". batchId doesn't exist.");
                 }
             });
         }
