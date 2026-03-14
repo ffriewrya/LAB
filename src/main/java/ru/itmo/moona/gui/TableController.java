@@ -11,7 +11,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.input.ContextMenuEvent;
-import javafx.scene.layout.Border;
 import javafx.scene.layout.GridPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
@@ -27,9 +26,11 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.Stack;
 
-import static ru.itmo.moona.domain.BatchUnit.*;
 import static ru.itmo.moona.service.StockUtils.formatter;
 import static ru.itmo.moona.service.StockUtils.formatterExp;
 
@@ -155,6 +156,7 @@ public class TableController {
         private void undo() {
             undo.run();
         }
+
         private void redo() {
             redo.run();
         }
@@ -203,6 +205,12 @@ public class TableController {
         reagentTable.setItems(r);
         batchTable.setItems(b);
         moveTable.setItems(m);
+
+        reagentTable.addEventFilter(ContextMenuEvent.CONTEXT_MENU_REQUESTED, e -> {
+            if (batchTable.getSelectionModel().getSelectedItem() == null) {
+                e.consume();
+            }
+        });
 
         batchTable.addEventFilter(ContextMenuEvent.CONTEXT_MENU_REQUESTED, e -> {
             if (batchTable.getSelectionModel().getSelectedItem() == null) {
@@ -317,8 +325,8 @@ public class TableController {
         Long id = sel.getId();
         try {
             newBatchWindow(manager.findBatch(id), "batches");
-        } catch (IOException e) {
-            showError("can't display batch list");
+        } catch (Exception e) {
+            showError(e.getMessage());
         }
     }
 
@@ -328,8 +336,8 @@ public class TableController {
         Long id = sel.getId();
         try {
             newMoveWindow(manager.showMoves(id));
-        } catch (IOException e) {
-            showError("can't display move list");
+        } catch (Exception e) {
+            showError(e.getMessage());
         }
     }
 
@@ -465,7 +473,7 @@ public class TableController {
 
         ComboBox<BatchUnit> unitBox = new ComboBox<>();
         unitBox.setItems(FXCollections.observableArrayList(BatchUnit.values()));
-        unitBox.setValue(G);
+        unitBox.setValue(BatchUnit.G);
 
 
         TextField location = new TextField();
@@ -500,6 +508,12 @@ public class TableController {
                 return null;
             }
             try {
+                Double parsedQ;
+                try {
+                    parsedQ = Double.parseDouble(quantity.getText());
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("invalid quantity. expected a number");
+                }
                 if (rgs.getValue() == null) {
                     throw new IllegalArgumentException("reagentId can't be null");
                 }
@@ -510,7 +524,7 @@ public class TableController {
                         .setOwnerUsername("SYSTEM")
                         .setReagentId(rgs.getValue().getId())
                         .setLabel(label.getText())
-                        .setQuantityCurrent(Double.parseDouble(quantity.getText()))
+                        .setQuantityCurrent(parsedQ)
                         .setUnit(unitBox.getValue())
                         .setLocation(location.getText())
                         .setStatus(statusBox.getValue())
@@ -589,6 +603,12 @@ public class TableController {
                 return null;
             }
             try {
+                Double parsedQ;
+                try {
+                    parsedQ = Double.parseDouble(quantity.getText());
+                } catch (NumberFormatException e) {
+                    throw new IllegalArgumentException("invalid quantity. expected a number");
+                }
                 if (batchComboBox.getValue() == null) {
                     throw new IllegalArgumentException("reagentId can't be null");
                 }
@@ -599,7 +619,7 @@ public class TableController {
                         .setBatchId(batchComboBox.getValue().getId())
                         .setUnit(manager.setMoveUnit(batchComboBox.getValue().getId()))
                         .setType(typeComboBox.getValue())
-                        .setQuantity(Double.parseDouble(quantity.getText()))
+                        .setQuantity(parsedQ)
                         .setReason(reason.getText())
                         .setMovedAt(movingDate.getValue().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
                 StockMove created = builder.build();
@@ -700,6 +720,90 @@ public class TableController {
                 showError(e.getMessage());
             }
         }
+    }
+
+    @FXML
+    private void handleUpdateBatch() {
+        Dialog<ReagentBatch> dialog = new Dialog<>();
+        dialog.setTitle("updating a batch");
+        dialog.setHeaderText("input your batch data");
+
+        ButtonType btn = new ButtonType("add", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(btn, ButtonType.CANCEL);
+        GridPane g = new GridPane();
+        g.setHgap(10);
+        g.setVgap(10);
+
+        TextField location = new TextField();
+        DatePicker expiresAt = new DatePicker();
+        ComboBox<BatchStatus> statusBox = new ComboBox<>();
+        statusBox.setItems(FXCollections.observableArrayList(BatchStatus.values()));
+        TextField label = new TextField();
+
+        g.add(new Label("location"), 0, 0);
+        g.add(location, 1, 0);
+        g.add(new Label("expiresAt"), 0, 1);
+        g.add(expiresAt, 1, 1);
+        g.add(new Label("status"), 0, 2);
+        g.add(statusBox, 1, 2);
+        g.add(new Label("label"), 0, 3);
+        g.add(label, 1, 3);
+
+        dialog.getDialogPane().setContent(g);
+
+        dialog.setResultConverter(clickedButton -> {
+            if (clickedButton == ButtonType.CANCEL) {
+                return null;
+            }
+            try {
+                if (location.getText().isBlank() && expiresAt.getValue() == null && statusBox.getValue() == null && label.getText().isBlank()) {
+                    return null;
+                }
+                ReagentBatch sel = batchTable.getSelectionModel().getSelectedItem();
+                return sel;
+            } catch (Exception e) {
+                showError(e.getMessage());
+            }
+            return null;
+        });
+
+        Optional<ReagentBatch> result = dialog.showAndWait();
+        result.ifPresent(batch -> {
+            try {
+                ReagentBatch.BatchMemento oldState = batch.createMemento();
+                if (!location.getText().isBlank()) {
+                    manager.updLocation(batch.getId(), location.getText());
+                }
+                if (expiresAt.getValue() != null) {
+                    manager.updExpiresAt(batch.getId(), expiresAt.getValue().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+                }
+                if (statusBox.getValue() != null) {
+                    manager.updStatus(batch.getId(), statusBox.getValue());
+                }
+                if (!label.getText().isBlank()) {
+                    manager.updLabel(batch.getId(), label.getText());
+                }
+                ReagentBatch.BatchMemento newState = batch.createMemento();
+                batch.addMemento(newState);
+
+                Runnable undoAction = () -> {
+                    batch.restoreFromMemento(oldState);
+                };
+
+                Runnable redoAction = () -> {
+                    batch.restoreFromMemento(newState);
+                };
+
+                UndoRedoManager mng = new UndoRedoManager(undoAction, redoAction, "updating batch");
+                undoStack.push(mng);
+                redoStack.clear();
+            } catch (Exception e) {
+                showError(e.getMessage());
+            }
+
+            showSuccess("successfully updated batch " + batch.getId());
+        });
+
     }
 
     private void undoRedoNot(String msg) {

@@ -298,15 +298,15 @@ public class StockManager {
         update(batch);
     }
 
-    public void updExpiresAt(long id, String date) {
+    public void updExpiresAt(long id, Instant date) {
         ReagentBatch batch = batches.get(id);
-        batch.setExpiresAt(StockUtils.parseDate(date));
+        batch.setExpiresAt(date);
         update(batch);
     }
 
-    public void updStatus(long id, String status) {
+    public void updStatus(long id, BatchStatus status) {
         ReagentBatch batch = batches.get(id);
-        batch.setStatus(StockUtils.findStatus(status));
+        batch.setStatus(status);
         update(batch);
     }
 

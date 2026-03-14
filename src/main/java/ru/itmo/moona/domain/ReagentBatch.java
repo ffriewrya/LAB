@@ -155,8 +155,31 @@ public final class ReagentBatch implements Batchable {
     }
 
     @JsonIgnore
-    public boolean isValid() {
-        return label != null && !label.isBlank() && label.length() <= 64 && quantityCurrent >= 0 && location != null && !location.isBlank() && location.length() <= 64 && expiresAt != null && unit != null && updatedAt != null && createdAt != null && ownerUsername != null;
+    public void isValid() {
+        if (label == null || label.isBlank() || label.length() > 64) {
+            throw new IllegalArgumentException("label can't be blank or have length exceeding 64 char");
+        }
+        if (quantityCurrent < 0) {
+            throw new IllegalArgumentException("quantityCurrent can't be negative");
+        }
+        if (location == null || location.isBlank() || location.length() > 64) {
+            throw new IllegalArgumentException("location can't be blank or have length exceeding 64 char");
+        }
+        if (expiresAt == null) {
+            throw new IllegalArgumentException("expiresAt can't be null");
+        }
+        if (unit == null) {
+            throw new IllegalArgumentException("unit can't be null");
+        }
+        if (updatedAt == null) {
+            throw new IllegalArgumentException("updatedAt can't be null");
+        }
+        if (createdAt == null) {
+            throw new IllegalArgumentException("createdAt can't be null");
+        }
+        if (ownerUsername == null) {
+            throw new IllegalArgumentException("ownerUsername can't be null");
+        }
     }
 
     public static class BatchBuilder {

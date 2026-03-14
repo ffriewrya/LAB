@@ -9,6 +9,7 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
@@ -19,7 +20,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.SVGPath?>
 
-<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="800.0" prefWidth="1500.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.itmo.moona.gui.TableController">
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="800.0" prefWidth="1500.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.itmo.moona.gui.TableController">
    <children>
       <VBox prefHeight="858.0" prefWidth="1614.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
@@ -82,6 +83,13 @@
                                        <columnResizePolicy>
                                           <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                                        </columnResizePolicy>
+                                       <contextMenu>
+                                          <ContextMenu>
+                                            <items>
+                                              <MenuItem mnemonicParsing="false" onAction="#handleBatchList" text="show batches" />
+                                            </items>
+                                          </ContextMenu>
+                                       </contextMenu>
                                     </TableView>
                                     <ButtonBar prefHeight="40.0" prefWidth="200.0">
                                        <buttons>
@@ -120,9 +128,11 @@
                                        <contextMenu>
                                           <ContextMenu>
                                             <items>
-                                                <MenuItem mnemonicParsing="false" onAction="#handleArchive" text="archive batch" />
+                                                <MenuItem mnemonicParsing="false" onAction="#handleUpdateBatch" text="update batch" />
+                                                <SeparatorMenuItem mnemonicParsing="false" />
                                               <MenuItem mnemonicParsing="false" onAction="#handleBatchHistory" text="batch history" />
                                                 <MenuItem mnemonicParsing="false" onAction="#handleMoveList" text="show batch moves" />
+                                                <MenuItem mnemonicParsing="false" onAction="#handleArchive" text="archive batch" />
                                             </items>
                                           </ContextMenu>
                                        </contextMenu>

@@ -3,7 +3,6 @@ package ru.itmo.moona.domain;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import ru.itmo.moona.service.StockUtils;
 
 import java.time.Instant;
 import java.util.Objects;
@@ -99,9 +98,31 @@ public final class Reagent {
     }
 
     @JsonIgnore
-    public boolean isValid() {
-        return name != null && !name.isBlank() && name.length() <= 128 && (formula == null || formula.length() <= 32) && (cas == null || cas.length() <= 32) && (hazardClass == null || hazardClass.length() <= 32) && updatedAt != null && createdAt != null && ownerUsername != null;
+    public void
+    isValid() {
+        if (name == null || name.isBlank() || name.length() > 128) {
+            throw new IllegalArgumentException("name can't be blank or have length exceeding 128 char");
+        }
+        if (formula != null && formula.length() > 32) {
+            throw new IllegalArgumentException("formula can't have length exceeding 32 char");
+        }
+        if (cas != null && cas.length() > 32) {
+            throw new IllegalArgumentException("cas can't have length exceeding 32 char");
+        }
+        if (hazardClass != null && hazardClass.length() > 32) {
+            throw new IllegalArgumentException("hazard class can't have length exceeding 32 char");
+        }
+        if (updatedAt == null) {
+            throw new IllegalArgumentException("updatedAt can't be null");
+        }
+        if (createdAt == null) {
+            throw new IllegalArgumentException("createdAt can't be null");
+        }
+        if (ownerUsername == null) {
+            throw new IllegalArgumentException("ownerUsername can't be null");
+        }
     }
+
 
     @Override
     public String toString() {

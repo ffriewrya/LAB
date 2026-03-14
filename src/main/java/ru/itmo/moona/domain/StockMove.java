@@ -1,14 +1,11 @@
 package ru.itmo.moona.domain;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import ru.itmo.moona.service.StockManager;
 import ru.itmo.moona.service.StockUtils;
 
 import java.time.Instant;
-import java.time.format.DateTimeParseException;
 import java.util.Objects;
 
 @JsonAutoDetect
@@ -117,8 +114,28 @@ public final class StockMove {
     }
 
     @JsonIgnore
-    public boolean isValid() {
-        return type != null && quantity > 0 && unit != null && (reason == null || reason.length() <= 128) && movedAt != null && createdAt != null && ownerUsername != null;
+    public void isValid() {
+        if (type == null) {
+            throw new IllegalArgumentException("type can't be null");
+        }
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("quantity must be greater than 0");
+        }
+        if (unit == null) {
+            throw new IllegalArgumentException("unit can't be null");
+        }
+        if (reason != null && reason.length() > 128) {
+            throw new IllegalArgumentException("reason can't have length exceeding 128 char");
+        }
+        if (movedAt == null) {
+            throw new IllegalArgumentException("movedAt can't be null");
+        }
+        if (createdAt == null) {
+            throw new IllegalArgumentException("createdAt can't be null");
+        }
+        if (ownerUsername == null) {
+            throw new IllegalArgumentException("ownerUsername can't be null");
+        }
     }
 
     private StockMove(MoveBuilder moveBuilder) {
