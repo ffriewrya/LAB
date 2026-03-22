@@ -11,51 +11,19 @@ public class StockManager {
     private final HashMap<Long, Reagent> reagents = new HashMap<>();
     private final HashMap<Long, ReagentBatch> batches = new HashMap<>();
     private final HashMap<Long, StockMove> moves = new HashMap<>();
-    private Long reagentId = 0L;
-    private Long batchId = 0L;
-    private Long moveId = 0L;
 
-    public void setReagentId(Long reagentId) {
-        this.reagentId = reagentId;
-    }
-
-    public void setBatchId(Long batchId) {
-        this.batchId = batchId;
-    }
-
-    public void setMoveId(Long moveId) {
-        this.moveId = moveId;
-    }
-
-    public Long genReagentId() {
-        Long generatedId = 1L + reagentId;
-        return generatedId;
-    }
-
-    public Long genBatchId() {
-        Long generatedId = 1L + batchId;
-        return generatedId;
-    }
-
-    public Long genMoveId() {
-        Long generatedId = 1L + moveId;
-        return generatedId;
-    }
 
     public void addBatch(ReagentBatch b) {
         batches.put(b.getId(), b);
-        batchId++;
     }
 
     public void addReagent(Reagent r) {
         reagents.put(r.getId(), r);
-        reagentId++;
     }
 
     public void addMove(StockMove m) {
         moves.put(m.getId(), m);
         update(batches.get(m.getBatchId()));
-        moveId++;
     }
 
     public BatchUnit setMoveUnit(long batchId) {
@@ -378,10 +346,6 @@ public class StockManager {
         moves.clear();
         moves.putAll(s.getMvs());
 
-
-        reagentId = reagents.isEmpty() ? 0L : Collections.max(reagents.keySet());
-        batchId = batches.isEmpty() ? 0L : Collections.max(batches.keySet());
-        moveId = moves.isEmpty()? 0L : Collections.max(moves.keySet());
     }
 }
 

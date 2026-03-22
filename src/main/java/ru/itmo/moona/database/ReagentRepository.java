@@ -1,6 +1,7 @@
 package ru.itmo.moona.database;
 
 import ru.itmo.moona.domain.Reagent;
+import ru.itmo.moona.domain.ReagentBatch;
 
 import java.sql.*;
 import java.time.Instant;
@@ -15,8 +16,8 @@ public class ReagentRepository {
         this.manager = manager;
     }
 
-    public void save(Reagent reagent) throws SQLException {
-        String sql = "INSERT INTO reagents (name, formula, cas, hazard_class, owner_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    public Long save(Reagent reagent) throws SQLException {
+        String sql = "INSERT INTO reagents (name, formula, cas, hazard_class, owner_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id";
 
         try (Connection connection = manager.getConnection();
              PreparedStatement statement = connection.prepareStatement(sql)) {
@@ -28,9 +29,13 @@ public class ReagentRepository {
             statement.setObject(6, reagent.getCreatedAt());
             statement.setObject(7, reagent.getUpdatedAt());
 
-            statement.executeUpdate();
+            try (ResultSet set = statement.executeQuery()) {
+                if (set.next()) return set.getLong(1);
+            }
         }
+        return null;
     }
+
 
     public List<Reagent> getReagents() throws SQLException {
         List<Reagent> result = new ArrayList<>();
@@ -54,5 +59,16 @@ public class ReagentRepository {
             }
         }
         return result;
+    }
+
+    public void deleteReagent(Reagent r) throws SQLException {
+        String sql = "DELETE FROM reagents WHERE id = ?";
+
+        try (Connection connection = manager.getConnection();
+             PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setLong(1, r.getId());
+            statement.executeUpdate();
+
+        }
     }
 }

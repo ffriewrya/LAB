@@ -16,6 +16,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import ru.itmo.moona.database.ReagentRepository;
 import ru.itmo.moona.domain.*;
 import ru.itmo.moona.domain.users.CurrentUser;
 import ru.itmo.moona.service.StockManager;
@@ -25,6 +26,7 @@ import ru.itmo.moona.storage.StockValidator;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -112,6 +114,7 @@ public class TableController {
     private StockManager manager;
     private FileStorage storage;
     private StockValidator validator;
+    private ReagentRepository reagentRepository;
 
     private ObservableList<Reagent> r;
     private ObservableList<ReagentBatch> b;
@@ -142,6 +145,10 @@ public class TableController {
 
     public void setMoves(HashMap<Long, StockMove> moves) {
         this.moves = moves;
+    }
+
+    public void setReagentRepository(ReagentRepository reagentRepository) {
+        this.reagentRepository = reagentRepository;
     }
 
     private class UndoRedoManager {
@@ -415,8 +422,7 @@ public class TableController {
                 return null;
             }
             try {
-                return new Reagent.ReagentBuilder()
-                        .setId(manager.genReagentId())
+                Reagent r = new Reagent.ReagentBuilder()
                         .setCreatedAt(Instant.now())
                         .setUpdatedAt(Instant.now())
                         .setOwnerId(CurrentUser.getInstance().getUser().getId())
@@ -425,10 +431,15 @@ public class TableController {
                         .setCas(cas.getText())
                         .setHazardClass(hz.getText())
                         .build();
+
+                    Long id = reagentRepository.save(r);
+                    r.setId(id);
+                    return r;
+
             } catch (Exception e) {
                 showError(e.getMessage());
+                return null;
             }
-            return null;
         });
 
         Optional<Reagent> result = dialog.showAndWait();
@@ -436,11 +447,22 @@ public class TableController {
             manager.addReagent(newReagent);
 
             Runnable undoAction = () -> {
-                manager.removeReagent(newReagent);
+                try {
+                    reagentRepository.deleteReagent(newReagent);
+                    manager.removeReagent(newReagent);
+                } catch (SQLException e) {
+                    showError("can't undo. database error");
+                }
             };
 
             Runnable redoAction = () -> {
-                manager.redoReagent(newReagent);
+                try {
+                    long id = reagentRepository.save(newReagent);
+                    newReagent.setId(id);
+                    manager.redoReagent(newReagent);
+                } catch (SQLException e) {
+                    showError("can't redo. database error");
+                }
             };
 
             UndoRedoManager mng = new UndoRedoManager(undoAction, redoAction, "adding reagent");
