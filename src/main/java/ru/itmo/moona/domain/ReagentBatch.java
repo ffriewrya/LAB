@@ -21,7 +21,7 @@ public final class ReagentBatch implements Batchable {
     private String location;
     private Instant expiresAt;
     private BatchStatus status;
-    private String ownerUsername;
+    private Long ownerId;
     private Instant createdAt;
     private Instant updatedAt;
 
@@ -39,7 +39,7 @@ public final class ReagentBatch implements Batchable {
         this.location = batchBuilder.location;
         this.expiresAt = batchBuilder.expiresAt;
         this.status = batchBuilder.status;
-        this.ownerUsername = batchBuilder.ownerUsername;
+        this.ownerId = batchBuilder.ownerId;
         this.createdAt = batchBuilder.createdAt;
         this.updatedAt = batchBuilder.updatedAt;
     }
@@ -108,12 +108,12 @@ public final class ReagentBatch implements Batchable {
         this.status = status;
     }
 
-    public String getOwnerUsername() {
-        return ownerUsername;
+    public Long getOwnerId() {
+        return ownerId;
     }
 
-    public void setOwnerUsername(String ownerUsername) {
-        this.ownerUsername = ownerUsername;
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
     }
 
     public Instant getCreatedAt() {
@@ -140,12 +140,12 @@ public final class ReagentBatch implements Batchable {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         ReagentBatch that = (ReagentBatch) o;
-        return id == that.id && reagentId == that.reagentId && Double.compare(quantityCurrent, that.quantityCurrent) == 0 && Objects.equals(label, that.label) && unit == that.unit && Objects.equals(location, that.location) && Objects.equals(expiresAt, that.expiresAt) && status == that.status && Objects.equals(ownerUsername, that.ownerUsername) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
+        return id == that.id && reagentId == that.reagentId && Double.compare(quantityCurrent, that.quantityCurrent) == 0 && Objects.equals(label, that.label) && unit == that.unit && Objects.equals(location, that.location) && Objects.equals(expiresAt, that.expiresAt) && status == that.status && Objects.equals(ownerId, that.ownerId) && Objects.equals(createdAt, that.createdAt) && Objects.equals(updatedAt, that.updatedAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, reagentId, label, quantityCurrent, unit, location, expiresAt, status, ownerUsername, createdAt, updatedAt);
+        return Objects.hash(id, reagentId, label, quantityCurrent, unit, location, expiresAt, status, ownerId, createdAt, updatedAt);
     }
 
 
@@ -177,8 +177,8 @@ public final class ReagentBatch implements Batchable {
         if (createdAt == null) {
             throw new IllegalArgumentException("createdAt can't be null");
         }
-        if (ownerUsername == null) {
-            throw new IllegalArgumentException("ownerUsername can't be null");
+        if (ownerId == null) {
+            throw new IllegalArgumentException("ownerId can't be null");
         }
     }
 
@@ -191,7 +191,7 @@ public final class ReagentBatch implements Batchable {
         private String location;
         private Instant expiresAt;
         private BatchStatus status;
-        private String ownerUsername;
+        private Long ownerId;
         private Instant createdAt;
         private Instant updatedAt;
 
@@ -248,8 +248,8 @@ public final class ReagentBatch implements Batchable {
             return this;
         }
 
-        public BatchBuilder setOwnerUsername(String ownerUsername) {
-            this.ownerUsername = ownerUsername;
+        public BatchBuilder setOwnerId(Long ownerId) {
+            this.ownerId = ownerId;
             return this;
         }
 
@@ -277,7 +277,7 @@ public final class ReagentBatch implements Batchable {
     }
 
     public BatchMemento createMemento() {
-        return new BatchMemento(this.id, this.reagentId, this.label, this.quantityCurrent, this.unit, this.location, this.expiresAt, this.status, this.ownerUsername, this.createdAt, this.updatedAt);
+        return new BatchMemento(this.id, this.reagentId, this.label, this.quantityCurrent, this.unit, this.location, this.expiresAt, this.status, this.ownerId, this.createdAt, this.updatedAt);
     }
 
     public void restoreStatusFromMemento(BatchMemento m) {
@@ -293,7 +293,7 @@ public final class ReagentBatch implements Batchable {
         this.location = m.location;
         this.expiresAt = m.expiresAt;
         this.status = m.status;
-        this.ownerUsername = m.ownerUsername;
+        this.ownerId = m.ownerId;
         this.createdAt = m.createdAt;
         this.updatedAt = m.updatedAt;
     }
@@ -308,14 +308,14 @@ public final class ReagentBatch implements Batchable {
         private String location;
         private Instant expiresAt;
         private BatchStatus status;
-        private String ownerUsername;
+        private Long ownerId;
         private Instant createdAt;
         private Instant updatedAt;
 
         private BatchMemento() {
         }
 
-        private BatchMemento(long id, long reagentId, String label, double quantityCurrent, BatchUnit unit, String location, Instant expiresAt, BatchStatus status, String ownerUsername, Instant createdAt, Instant updatedAt) {
+        private BatchMemento(long id, long reagentId, String label, double quantityCurrent, BatchUnit unit, String location, Instant expiresAt, BatchStatus status, Long ownerId, Instant createdAt, Instant updatedAt) {
             this.id = id;
             this.reagentId = reagentId;
             this.label = label;
@@ -324,7 +324,7 @@ public final class ReagentBatch implements Batchable {
             this.location = location;
             this.expiresAt = expiresAt;
             this.status = status;
-            this.ownerUsername = ownerUsername;
+            this.ownerId = ownerId;
             this.createdAt = createdAt;
             this.updatedAt = updatedAt;
         }
@@ -393,12 +393,12 @@ public final class ReagentBatch implements Batchable {
             this.status = status;
         }
 
-        public String getOwnerUsername() {
-            return ownerUsername;
+        public Long getOwnerId() {
+            return ownerId;
         }
 
-        public void setOwnerUsername(String ownerUsername) {
-            this.ownerUsername = ownerUsername;
+        public void setOwnerId(Long ownerId) {
+            this.ownerId = ownerId;
         }
 
         public Instant getCreatedAt() {
@@ -419,7 +419,7 @@ public final class ReagentBatch implements Batchable {
 
         @Override
         public String toString() {
-            return String.format("%-10s %-15s %-10s %-10s %-15s %-15s %-10s %-15s %-25s %-25s", reagentId, label, quantityCurrent, unit, location, StockUtils.formatterExp.format(expiresAt), status, ownerUsername, StockUtils.formatter.format(createdAt), StockUtils.formatter.format(updatedAt));
+            return String.format("%-10s %-15s %-10s %-10s %-15s %-15s %-10s %-15s %-25s %-25s", reagentId, label, quantityCurrent, unit, location, StockUtils.formatterExp.format(expiresAt), status, ownerId, StockUtils.formatter.format(createdAt), StockUtils.formatter.format(updatedAt));
         }
 
     }

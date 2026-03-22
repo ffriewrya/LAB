@@ -11,7 +11,7 @@ public interface Batchable {
     String getLocation();
     Instant getExpiresAt();
     BatchStatus getStatus();
-    String getOwnerUsername();
+    Long getOwnerId();
     Instant getCreatedAt();
     Instant getUpdatedAt();
 }

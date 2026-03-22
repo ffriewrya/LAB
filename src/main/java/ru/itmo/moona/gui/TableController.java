@@ -17,6 +17,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import ru.itmo.moona.domain.*;
+import ru.itmo.moona.domain.users.CurrentUser;
 import ru.itmo.moona.service.StockManager;
 import ru.itmo.moona.storage.FileStorage;
 import ru.itmo.moona.storage.StockSnapshot;
@@ -24,6 +25,7 @@ import ru.itmo.moona.storage.StockValidator;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.HashMap;
@@ -415,9 +417,9 @@ public class TableController {
             try {
                 return new Reagent.ReagentBuilder()
                         .setId(manager.genReagentId())
-                        .setCreatedAt()
-                        .setUpdatedAt()
-                        .setOwnerUsername("SYSTEM")
+                        .setCreatedAt(Instant.now())
+                        .setUpdatedAt(Instant.now())
+                        .setOwnerId(CurrentUser.getInstance().getUser().getId())
                         .setName(name.getText())
                         .setFormula(formula.getText())
                         .setCas(cas.getText())
@@ -521,7 +523,7 @@ public class TableController {
                         .setId(manager.genBatchId())
                         .setCreatedAt()
                         .setUpdatedAt()
-                        .setOwnerUsername("SYSTEM")
+                        .setOwnerId(CurrentUser.getInstance().getUser().getId())
                         .setReagentId(rgs.getValue().getId())
                         .setLabel(label.getText())
                         .setQuantityCurrent(parsedQ)
@@ -615,7 +617,7 @@ public class TableController {
                 StockMove.MoveBuilder builder = new StockMove.MoveBuilder();
                 builder.setId(manager.genMoveId())
                         .setCreatedAt()
-                        .setOwnerUsername("SYSTEM")
+                        .setOwnerId(CurrentUser.getInstance().getUser().getId())
                         .setBatchId(batchComboBox.getValue().getId())
                         .setUnit(manager.setMoveUnit(batchComboBox.getValue().getId()))
                         .setType(typeComboBox.getValue())

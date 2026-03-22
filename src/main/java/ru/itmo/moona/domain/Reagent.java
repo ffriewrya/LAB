@@ -15,7 +15,7 @@ public final class Reagent {
     private String formula;
     private String cas;
     private String hazardClass;
-    private String ownerUsername;
+    private Long ownerId;
     private Instant createdAt;
     private Instant updatedAt;
 
@@ -25,7 +25,7 @@ public final class Reagent {
         this.formula = reagentBuilder.formula;
         this.cas = reagentBuilder.cas;
         this.hazardClass = reagentBuilder.hazardClass;
-        this.ownerUsername = reagentBuilder.ownerUsername;
+        this.ownerId = reagentBuilder.ownerId;
         this.createdAt = reagentBuilder.createdAt;
         this.updatedAt = reagentBuilder.updatedAt;
     }
@@ -73,12 +73,12 @@ public final class Reagent {
         this.hazardClass = hazardClass;
     }
 
-    public String getOwnerUsername() {
-        return ownerUsername;
+    public Long getOwnerId() {
+        return ownerId;
     }
 
-    public void setOwnerUsername(String ownerUsername) {
-        this.ownerUsername = ownerUsername;
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
     }
 
     public Instant getCreatedAt() {
@@ -118,8 +118,8 @@ public final class Reagent {
         if (createdAt == null) {
             throw new IllegalArgumentException("createdAt can't be null");
         }
-        if (ownerUsername == null) {
-            throw new IllegalArgumentException("ownerUsername can't be null");
+        if (ownerId == null) {
+            throw new IllegalArgumentException("ownerId can't be null");
         }
     }
 
@@ -133,7 +133,7 @@ public final class Reagent {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Reagent reagent = (Reagent) o;
-        return id == reagent.id && Objects.equals(name, reagent.name) && Objects.equals(formula, reagent.formula) && Objects.equals(cas, reagent.cas) && Objects.equals(hazardClass, reagent.hazardClass) && Objects.equals(ownerUsername, reagent.ownerUsername) && Objects.equals(createdAt, reagent.createdAt) && Objects.equals(updatedAt, reagent.updatedAt);
+        return id == reagent.id && Objects.equals(name, reagent.name) && Objects.equals(formula, reagent.formula) && Objects.equals(cas, reagent.cas) && Objects.equals(hazardClass, reagent.hazardClass) && Objects.equals(ownerId, reagent.ownerId) && Objects.equals(createdAt, reagent.createdAt) && Objects.equals(updatedAt, reagent.updatedAt);
     }
 
     @Override
@@ -147,7 +147,7 @@ public final class Reagent {
         private String formula; //optional
         private String cas; //optional
         private String hazardClass; //optional
-        private String ownerUsername;
+        private Long ownerId;
         private Instant createdAt;
         private Instant updatedAt;
 
@@ -176,18 +176,18 @@ public final class Reagent {
             }
         }
 
-        public ReagentBuilder setOwnerUsername(String ownerUsername) {
-            this.ownerUsername = ownerUsername;
+        public ReagentBuilder setOwnerId(Long ownerId) {
+            this.ownerId = ownerId;
             return this;
         }
 
-        public ReagentBuilder setCreatedAt() {
-            this.createdAt = Instant.now();
+        public ReagentBuilder setCreatedAt(Instant createdAt) {
+            this.createdAt = createdAt;
             return this;
         }
 
-        public ReagentBuilder setUpdatedAt() {
-            this.updatedAt = Instant.now();
+        public ReagentBuilder setUpdatedAt(Instant updatedAt) {
+            this.updatedAt = updatedAt;
             return this;
         }
 

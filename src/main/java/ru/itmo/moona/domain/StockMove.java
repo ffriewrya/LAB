@@ -17,7 +17,7 @@ public final class StockMove {
     private double quantity;
     private BatchUnit unit;
     private String reason;
-    private String ownerUsername;
+    private Long ownerId;
     private Instant movedAt;
     private Instant createdAt;
 
@@ -72,12 +72,12 @@ public final class StockMove {
         this.reason = reason;
     }
 
-    public String getOwnerUsername() {
-        return ownerUsername;
+    public Long getOwnerId() {
+        return ownerId;
     }
 
-    public void setOwnerUsername(String ownerUsername) {
-        this.ownerUsername = ownerUsername;
+    public void setOwnerId(Long ownerId) {
+        this.ownerId = ownerId;
     }
 
     public Instant getMovedAt() {
@@ -100,17 +100,17 @@ public final class StockMove {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         StockMove stockMove = (StockMove) o;
-        return id == stockMove.id && batchId == stockMove.batchId && Double.compare(quantity, stockMove.quantity) == 0 && type == stockMove.type && unit == stockMove.unit && Objects.equals(reason, stockMove.reason) && Objects.equals(ownerUsername, stockMove.ownerUsername) && Objects.equals(movedAt, stockMove.movedAt) && Objects.equals(createdAt, stockMove.createdAt);
+        return id == stockMove.id && batchId == stockMove.batchId && Double.compare(quantity, stockMove.quantity) == 0 && type == stockMove.type && unit == stockMove.unit && Objects.equals(reason, stockMove.reason) && Objects.equals(ownerId, stockMove.ownerId) && Objects.equals(movedAt, stockMove.movedAt) && Objects.equals(createdAt, stockMove.createdAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, batchId, type, quantity, unit, reason, ownerUsername, movedAt, createdAt);
+        return Objects.hash(id, batchId, type, quantity, unit, reason, ownerId, movedAt, createdAt);
     }
 
     @Override
     public String toString() {
-        return String.format("%-4s %-10s %-15s %-10s %-10s %-15s %-15s %-15s %-25s", id, batchId, type, quantity, unit, reason, ownerUsername, StockUtils.formatterExp.format(movedAt), StockUtils.formatter.format(createdAt));
+        return String.format("%-4s %-10s %-15s %-10s %-10s %-15s %-15s %-15s %-25s", id, batchId, type, quantity, unit, reason, ownerId, StockUtils.formatterExp.format(movedAt), StockUtils.formatter.format(createdAt));
     }
 
     @JsonIgnore
@@ -133,8 +133,8 @@ public final class StockMove {
         if (createdAt == null) {
             throw new IllegalArgumentException("createdAt can't be null");
         }
-        if (ownerUsername == null) {
-            throw new IllegalArgumentException("ownerUsername can't be null");
+        if (ownerId == null) {
+            throw new IllegalArgumentException("ownerId can't be null");
         }
     }
 
@@ -145,7 +145,7 @@ public final class StockMove {
         this.quantity = moveBuilder.quantity;
         this.unit = moveBuilder.unit;
         this.reason = moveBuilder.reason;
-        this.ownerUsername = moveBuilder.ownerUsername;
+        this.ownerId = moveBuilder.ownerId;
         this.movedAt = moveBuilder.movedAt;
         this.createdAt = moveBuilder.createdAt;
     }
@@ -157,7 +157,7 @@ public final class StockMove {
         private double quantity;
         private BatchUnit unit;
         private String reason;
-        private String ownerUsername;
+        private Long ownerId;
         private Instant movedAt;
         private Instant createdAt;
 
@@ -200,8 +200,8 @@ public final class StockMove {
             }
         }
 
-        public MoveBuilder setOwnerUsername(String ownerUsername) {
-            this.ownerUsername = ownerUsername;
+        public MoveBuilder setOwnerId(Long ownerId) {
+            this.ownerId = ownerId;
             return this;
         }
 
