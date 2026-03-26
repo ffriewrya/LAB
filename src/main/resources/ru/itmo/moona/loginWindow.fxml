@@ -9,16 +9,16 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.itmo.moona.gui.LoginController">
    <children>
       <VBox prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
       <Label text="username" AnchorPane.leftAnchor="194.5" AnchorPane.topAnchor="100.0" />
-      <TextField layoutY="92.0" prefHeight="34.0" prefWidth="211.0" AnchorPane.leftAnchor="194.5" AnchorPane.rightAnchor="194.40000000000003" AnchorPane.topAnchor="120.0" />
-      <PasswordField prefHeight="34.0" prefWidth="211.0" promptText="password" AnchorPane.leftAnchor="194.5" AnchorPane.rightAnchor="194.40000000000003" AnchorPane.topAnchor="170.0" />
+      <TextField fx:id="username" layoutY="92.0" prefHeight="34.0" prefWidth="211.0" AnchorPane.leftAnchor="194.5" AnchorPane.rightAnchor="194.40000000000003" AnchorPane.topAnchor="120.0" />
+      <PasswordField fx:id="password" prefHeight="34.0" prefWidth="211.0" promptText="password" AnchorPane.leftAnchor="194.5" AnchorPane.rightAnchor="194.40000000000003" AnchorPane.topAnchor="170.0" />
       <ButtonBar prefHeight="40.0" prefWidth="200.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="220.0">
         <buttons>
-          <Button mnemonicParsing="false" text="login" />
-            <Button mnemonicParsing="false" text="register" />
+          <Button mnemonicParsing="false" onAction="#handleLogin" text="login" />
+            <Button mnemonicParsing="false" onAction="#handleRegister" text="register" />
         </buttons>
          <padding>
             <Insets right="220.0" />

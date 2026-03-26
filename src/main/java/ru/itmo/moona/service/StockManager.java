@@ -38,6 +38,18 @@ public class StockManager {
         return false;
     }
 
+    public void setReagents(HashMap<Long, Reagent> r) {
+        reagents.putAll(r);
+    }
+
+    public void setBatches(HashMap<Long, ReagentBatch> b) {
+        batches.putAll(b);
+    }
+
+    public void setMoves(HashMap<Long, StockMove> m) {
+        moves.putAll(m);
+    }
+
     public HashMap<Long, Reagent> getReagents() {
         return reagents;
     }
@@ -133,6 +145,7 @@ public class StockManager {
         }
         return result;
     }
+
     public List<ReagentBatch> findActiveBatches() {
         List<ReagentBatch> result = new ArrayList<>();
         for (ReagentBatch batch : batches.values()) {

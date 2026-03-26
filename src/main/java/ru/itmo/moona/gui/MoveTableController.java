@@ -32,7 +32,7 @@ public class MoveTableController {
     @FXML
     private TableColumn<StockMove, String> moveReasonCol;
     @FXML
-    private TableColumn<StockMove, String> moveOwnerUsernameCol;
+    private TableColumn<StockMove, Long> moveOwnerUsernameCol;
     @FXML
     private TableColumn<StockMove, String> moveMovedAtCol;
     @FXML
@@ -46,7 +46,7 @@ public class MoveTableController {
         moveQuantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         moveUnitCol.setCellValueFactory(new PropertyValueFactory<>("unit"));
         moveReasonCol.setCellValueFactory(new PropertyValueFactory<>("reason"));
-        moveOwnerUsernameCol.setCellValueFactory(new PropertyValueFactory<>("ownerUsername"));
+        moveOwnerUsernameCol.setCellValueFactory(new PropertyValueFactory<>("ownerId"));
         moveMovedAtCol.setCellValueFactory(cellData -> new SimpleStringProperty(formatterExp.format(cellData.getValue().getMovedAt())));
         moveCreatedAtCol.setCellValueFactory(cellData -> new SimpleStringProperty(formatter.format(cellData.getValue().getCreatedAt())));
 

@@ -16,9 +16,12 @@ import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.util.Duration;
+import ru.itmo.moona.database.BatchRepository;
+import ru.itmo.moona.database.MoveRepository;
 import ru.itmo.moona.database.ReagentRepository;
 import ru.itmo.moona.domain.*;
 import ru.itmo.moona.domain.users.CurrentUser;
+import ru.itmo.moona.domain.users.User;
 import ru.itmo.moona.service.StockManager;
 import ru.itmo.moona.storage.FileStorage;
 import ru.itmo.moona.storage.StockSnapshot;
@@ -53,7 +56,7 @@ public class TableController {
     @FXML
     private TableColumn<Reagent, String> reagentHazardClassCol;
     @FXML
-    private TableColumn<Reagent, String> reagentOwnerUsernameCol;
+    private TableColumn<Reagent, Long> reagentOwnerUsernameCol;
     @FXML
     private TableColumn<Reagent, String> reagentCreatedAtCol;
     @FXML
@@ -78,7 +81,7 @@ public class TableController {
     @FXML
     private TableColumn<ReagentBatch, BatchStatus> batchStatusCol;
     @FXML
-    private TableColumn<ReagentBatch, String> batchOwnerUsernameCol;
+    private TableColumn<ReagentBatch, Long> batchOwnerUsernameCol;
     @FXML
     private TableColumn<ReagentBatch, String> batchCreatedAtCol;
     @FXML
@@ -99,13 +102,19 @@ public class TableController {
     @FXML
     private TableColumn<StockMove, String> moveReasonCol;
     @FXML
-    private TableColumn<StockMove, String> moveOwnerUsernameCol;
+    private TableColumn<StockMove, Long> moveOwnerUsernameCol;
     @FXML
     private TableColumn<StockMove, String> moveMovedAtCol;
     @FXML
     private TableColumn<StockMove, String> moveCreatedAtCol;
     @FXML
     private Label undoRedo;
+    @FXML
+    private Label currentUser;
+    @FXML
+    private MenuItem updBatch;
+    @FXML
+    private MenuItem archiveBatch;
 
 
     private HashMap<Long, Reagent> reagents;
@@ -114,7 +123,10 @@ public class TableController {
     private StockManager manager;
     private FileStorage storage;
     private StockValidator validator;
+
     private ReagentRepository reagentRepository;
+    private BatchRepository batchRepository;
+    private MoveRepository moveRepository;
 
     private ObservableList<Reagent> r;
     private ObservableList<ReagentBatch> b;
@@ -151,6 +163,14 @@ public class TableController {
         this.reagentRepository = reagentRepository;
     }
 
+    public void setBatchRepository(BatchRepository batchRepository) {
+        this.batchRepository = batchRepository;
+    }
+
+    public void setMoveRepository(MoveRepository moveRepository) {
+        this.moveRepository = moveRepository;
+    }
+
     private class UndoRedoManager {
         private Runnable undo;
         private Runnable redo;
@@ -175,7 +195,7 @@ public class TableController {
         }
     }
 
-    public void initializeTable() {
+    public void initializeTable() throws SQLException {
         r = FXCollections.observableArrayList(reagents.values());
         b = FXCollections.observableArrayList(batches.values());
         m = FXCollections.observableArrayList(moves.values());
@@ -185,7 +205,7 @@ public class TableController {
         reagentFormulaCol.setCellValueFactory(new PropertyValueFactory<>("formula"));
         reagentCasCol.setCellValueFactory(new PropertyValueFactory<>("cas"));
         reagentHazardClassCol.setCellValueFactory(new PropertyValueFactory<>("hazardClass"));
-        reagentOwnerUsernameCol.setCellValueFactory(new PropertyValueFactory<>("ownerUsername"));
+        reagentOwnerUsernameCol.setCellValueFactory(new PropertyValueFactory<>("ownerId"));
         reagentCreatedAtCol.setCellValueFactory(cellData -> new SimpleStringProperty(formatter.format(cellData.getValue().getCreatedAt())));
         reagentUpdatedAtCol.setCellValueFactory(cellData -> new SimpleStringProperty(formatter.format(cellData.getValue().getUpdatedAt())));
 
@@ -197,7 +217,7 @@ public class TableController {
         batchLocationCol.setCellValueFactory(new PropertyValueFactory<>("location"));
         batchExpiresAtCol.setCellValueFactory(cellData -> new SimpleStringProperty(formatterExp.format(cellData.getValue().getExpiresAt())));
         batchStatusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
-        batchOwnerUsernameCol.setCellValueFactory(new PropertyValueFactory<>("ownerUsername"));
+        batchOwnerUsernameCol.setCellValueFactory(new PropertyValueFactory<>("ownerId"));
         batchCreatedAtCol.setCellValueFactory(cellData -> new SimpleStringProperty(formatter.format(cellData.getValue().getCreatedAt())));
         batchUpdatedAtCol.setCellValueFactory(cellData -> new SimpleStringProperty(formatter.format(cellData.getValue().getUpdatedAt())));
 
@@ -207,13 +227,14 @@ public class TableController {
         moveQuantityCol.setCellValueFactory(new PropertyValueFactory<>("quantity"));
         moveUnitCol.setCellValueFactory(new PropertyValueFactory<>("unit"));
         moveReasonCol.setCellValueFactory(new PropertyValueFactory<>("reason"));
-        moveOwnerUsernameCol.setCellValueFactory(new PropertyValueFactory<>("ownerUsername"));
+        moveOwnerUsernameCol.setCellValueFactory(new PropertyValueFactory<>("ownerId"));
         moveMovedAtCol.setCellValueFactory(cellData -> new SimpleStringProperty(formatterExp.format(cellData.getValue().getMovedAt())));
         moveCreatedAtCol.setCellValueFactory(cellData -> new SimpleStringProperty(formatter.format(cellData.getValue().getCreatedAt())));
 
         reagentTable.setItems(r);
         batchTable.setItems(b);
         moveTable.setItems(m);
+        displayUser();
 
         reagentTable.addEventFilter(ContextMenuEvent.CONTEXT_MENU_REQUESTED, e -> {
             if (batchTable.getSelectionModel().getSelectedItem() == null) {
@@ -226,10 +247,32 @@ public class TableController {
                 e.consume();
             }
         });
+
+        batchTable.getSelectionModel().selectedItemProperty().addListener((o, oldB, newB) -> {
+            Long currentUserId = CurrentUser.getInstance().getUser().getId();
+            if (newB != null) {
+                if (currentUserId != newB.getOwnerId()) {
+                    updBatch.setDisable(true);
+                    archiveBatch.setDisable(true);
+                } else {
+                    updBatch.setDisable(false);
+                    archiveBatch.setDisable(false);
+                }
+            }
+        });
+
+
+    }
+
+    private void displayUser() {
+        User user = CurrentUser.getInstance().getUser();
+        if (user != null) {
+            currentUser.setText("current user: " + user);
+        }
     }
 
     @FXML
-    public void initialize() {
+    public void initialize() throws SQLException {
         if (reagents != null && batches != null && moves != null) {
             initializeTable();
 
@@ -297,15 +340,27 @@ public class TableController {
             ReagentBatch.BatchMemento oldState = sel.createMemento();
             Long id = sel.getId();
             manager.archiveBatch(id);
+            batchRepository.updStatus(sel);
             ReagentBatch.BatchMemento newState = sel.createMemento();
             sel.addMemento(newState);
+            batchRepository.addMemento(newState);
 
             Runnable undoAction = () -> {
                 sel.restoreStatusFromMemento(oldState);
+                try {
+                    batchRepository.updStatus(sel);
+                } catch (SQLException e) {
+                    throw new IllegalArgumentException("database error");
+                }
             };
 
             Runnable redoAction = () -> {
                 sel.restoreStatusFromMemento(newState);
+                try {
+                    batchRepository.updStatus(sel);
+                } catch (SQLException e) {
+                    throw new IllegalArgumentException("database error");
+                }
             };
 
             UndoRedoManager m = new UndoRedoManager(undoAction, redoAction, "archivation");
@@ -363,6 +418,9 @@ public class TableController {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("error!");
         alert.setContentText(e);
+
+        alert.getDialogPane().setPrefWidth(500);  // Задаем предпочитаемую ширину
+        alert.getDialogPane().setPrefHeight(250);
         alert.initModality(Modality.APPLICATION_MODAL);
         alert.showAndWait();
     }
@@ -431,10 +489,7 @@ public class TableController {
                         .setCas(cas.getText())
                         .setHazardClass(hz.getText())
                         .build();
-
-                    Long id = reagentRepository.save(r);
-                    r.setId(id);
-                    return r;
+                return r;
 
             } catch (Exception e) {
                 showError(e.getMessage());
@@ -444,6 +499,11 @@ public class TableController {
 
         Optional<Reagent> result = dialog.showAndWait();
         result.ifPresent(newReagent -> {
+            try {
+                reagentRepository.save(newReagent);
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
             manager.addReagent(newReagent);
 
             Runnable undoAction = () -> {
@@ -457,8 +517,7 @@ public class TableController {
 
             Runnable redoAction = () -> {
                 try {
-                    long id = reagentRepository.save(newReagent);
-                    newReagent.setId(id);
+                    reagentRepository.save(newReagent);
                     manager.redoReagent(newReagent);
                 } catch (SQLException e) {
                     showError("can't redo. database error");
@@ -541,10 +600,9 @@ public class TableController {
                 if (rgs.getValue() == null) {
                     throw new IllegalArgumentException("reagentId can't be null");
                 }
-                return new ReagentBatch.BatchBuilder()
-                        .setId(manager.genBatchId())
-                        .setCreatedAt()
-                        .setUpdatedAt()
+                ReagentBatch b = new ReagentBatch.BatchBuilder()
+                        .setCreatedAt(Instant.now())
+                        .setUpdatedAt(Instant.now())
                         .setOwnerId(CurrentUser.getInstance().getUser().getId())
                         .setReagentId(rgs.getValue().getId())
                         .setLabel(label.getText())
@@ -554,6 +612,9 @@ public class TableController {
                         .setStatus(statusBox.getValue())
                         .setExpiresAt(expiresAt.getValue().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant())
                         .build();
+
+                return b;
+
             } catch (Exception e) {
                 showError(e.getMessage());
             }
@@ -562,13 +623,29 @@ public class TableController {
 
         Optional<ReagentBatch> result = dialog.showAndWait();
         result.ifPresent(newBatch -> {
-            manager.addBatch(newBatch);
+            try {
+                batchRepository.saveBatchWithMemento(newBatch);
+                manager.addBatch(newBatch);
+                batchRepository.addMemento(newBatch.getHistory().getLast());
+            } catch (SQLException e) {
+                throw new IllegalArgumentException("database error");
+            }
 
             Runnable undoAction = () -> {
+                try {
+                    batchRepository.deleteBatch(newBatch);
+                } catch (SQLException e) {
+                    throw new IllegalArgumentException("can't undo. database error");
+                }
                 manager.removeBatch(newBatch);
             };
 
             Runnable redoAction = () -> {
+                try {
+                    batchRepository.saveBatchWithMemento(newBatch);
+                } catch (SQLException e) {
+                    throw new IllegalArgumentException("can't redo. database error");
+                }
                 manager.redoBatch(newBatch);
             };
 
@@ -637,8 +714,8 @@ public class TableController {
                     throw new IllegalArgumentException("reagentId can't be null");
                 }
                 StockMove.MoveBuilder builder = new StockMove.MoveBuilder();
-                builder.setId(manager.genMoveId())
-                        .setCreatedAt()
+                builder
+                        .setCreatedAt(Instant.now())
                         .setOwnerId(CurrentUser.getInstance().getUser().getId())
                         .setBatchId(batchComboBox.getValue().getId())
                         .setUnit(manager.setMoveUnit(batchComboBox.getValue().getId()))
@@ -652,6 +729,8 @@ public class TableController {
                 } else {
                     manager.moveOutDiscard(created);
                 }
+                batchRepository.updQuantity(created.getBatchId());
+                batchRepository.addMemento(manager.getBatch(created.getBatchId()).getHistory().getLast());
                 return created;
             } catch (Exception e) {
                 showError(e.getMessage());
@@ -661,23 +740,50 @@ public class TableController {
 
         Optional<StockMove> result = dialog.showAndWait();
         result.ifPresent(newMove -> {
+            try {
+                moveRepository.save(newMove);
+            } catch (SQLException e) {
+                throw new IllegalArgumentException("database error");
+            }
             manager.addMove(newMove);
 
             Runnable undoAction = () -> {
                 manager.removeMove(newMove);
+                try {
+                    moveRepository.deleteMove(newMove);
+                } catch (SQLException e) {
+                    throw new IllegalArgumentException("database error");
+                }
                 if (newMove.getType() == StockMoveType.IN) {
                     manager.moveOutDiscard(newMove);
                 } else {
                     manager.moveIn(newMove);
                 }
+                try {
+                    batchRepository.updQuantity(newMove.getBatchId());
+                    batchRepository.addMemento(manager.getBatch(newMove.getBatchId()).getHistory().getLast());
+                } catch (SQLException e) {
+                    throw new IllegalArgumentException("database error");
+                }
             };
 
             Runnable redoAction = () -> {
                 manager.redoMove(newMove);
+                try {
+                    moveRepository.save(newMove);
+                } catch (SQLException e) {
+                    throw new IllegalArgumentException("database error");
+                }
                 if (newMove.getType() == StockMoveType.IN) {
                     manager.moveIn(newMove);
                 } else {
                     manager.moveOutDiscard(newMove);
+                }
+                try {
+                    batchRepository.updQuantity(newMove.getBatchId());
+                    batchRepository.addMemento(manager.getBatch(newMove.getBatchId()).getHistory().getLast());
+                } catch (SQLException e) {
+                    throw new IllegalArgumentException("database error");
                 }
             };
 
@@ -797,25 +903,40 @@ public class TableController {
                 ReagentBatch.BatchMemento oldState = batch.createMemento();
                 if (!location.getText().isBlank()) {
                     manager.updLocation(batch.getId(), location.getText());
+                    batchRepository.updLocation(batch);
                 }
                 if (expiresAt.getValue() != null) {
                     manager.updExpiresAt(batch.getId(), expiresAt.getValue().atStartOfDay().atZone(ZoneId.systemDefault()).toInstant());
+                    batchRepository.updExpiresAt(batch);
                 }
                 if (statusBox.getValue() != null) {
                     manager.updStatus(batch.getId(), statusBox.getValue());
+                    batchRepository.updStatus(batch);
                 }
                 if (!label.getText().isBlank()) {
                     manager.updLabel(batch.getId(), label.getText());
+                    batchRepository.updLabel(batch);
                 }
                 ReagentBatch.BatchMemento newState = batch.createMemento();
                 batch.addMemento(newState);
+                batchRepository.addMemento(newState);
 
                 Runnable undoAction = () -> {
                     batch.restoreFromMemento(oldState);
+                    try {
+                        batchRepository.fullUpdate(batch);
+                    } catch (SQLException e) {
+                        throw new IllegalArgumentException("database error");
+                    }
                 };
 
                 Runnable redoAction = () -> {
                     batch.restoreFromMemento(newState);
+                    try {
+                        batchRepository.fullUpdate(batch);
+                    } catch (SQLException e) {
+                        throw new IllegalArgumentException("database error");
+                    }
                 };
 
                 UndoRedoManager mng = new UndoRedoManager(undoAction, redoAction, "updating batch");

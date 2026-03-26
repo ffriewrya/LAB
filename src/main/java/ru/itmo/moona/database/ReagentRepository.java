@@ -6,6 +6,7 @@ import ru.itmo.moona.domain.ReagentBatch;
 import java.sql.*;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class ReagentRepository {
@@ -16,7 +17,7 @@ public class ReagentRepository {
         this.manager = manager;
     }
 
-    public Long save(Reagent reagent) throws SQLException {
+    public void save(Reagent reagent) throws SQLException {
         String sql = "INSERT INTO reagents (name, formula, cas, hazard_class, owner_id, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id";
 
         try (Connection connection = manager.getConnection();
@@ -26,19 +27,18 @@ public class ReagentRepository {
             statement.setString(3, reagent.getCas());
             statement.setString(4, reagent.getHazardClass());
             statement.setLong(5, reagent.getOwnerId());
-            statement.setObject(6, reagent.getCreatedAt());
-            statement.setObject(7, reagent.getUpdatedAt());
+            statement.setTimestamp(6, java.sql.Timestamp.from(reagent.getCreatedAt()));
+            statement.setObject(7, java.sql.Timestamp.from(reagent.getUpdatedAt()));
 
             try (ResultSet set = statement.executeQuery()) {
-                if (set.next()) return set.getLong(1);
+                if (set.next())  reagent.setId(set.getLong(1));
             }
         }
-        return null;
     }
 
 
-    public List<Reagent> getReagents() throws SQLException {
-        List<Reagent> result = new ArrayList<>();
+    public HashMap<Long, Reagent> getReagents() throws SQLException {
+        HashMap<Long, Reagent> result = new HashMap<>();
         String sql = "SELECT * FROM reagents";
 
         try (Connection connection = manager.getConnection();
@@ -52,10 +52,10 @@ public class ReagentRepository {
                         .setCas(set.getString("cas"))
                         .setHazardClass(set.getString("hazard_class"))
                         .setOwnerId(set.getLong("owner_id"))
-                        .setCreatedAt(set.getObject("created_at", Instant.class))
-                        .setUpdatedAt(set.getObject("updated_at", Instant.class))
+                        .setCreatedAt(set.getTimestamp("created_at").toInstant())
+                        .setUpdatedAt(set.getTimestamp("updated_at").toInstant())
                         .build();
-                result.add(b);
+                result.put(b.getId(), b);
             }
         }
         return result;

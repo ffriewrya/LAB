@@ -215,8 +215,8 @@ public final class StockMove {
             return this;
         }
 
-        public MoveBuilder setCreatedAt() {
-            this.createdAt = Instant.now();
+        public MoveBuilder setCreatedAt(Instant createdAt) {
+            this.createdAt = createdAt;
             return this;
         }
 

@@ -37,7 +37,7 @@ public class BatchTableController {
     @FXML
     private TableColumn<Batchable, BatchStatus> batchStatusCol;
     @FXML
-    private TableColumn<Batchable, String> batchOwnerUsernameCol;
+    private TableColumn<Batchable, Long> batchOwnerUsernameCol;
     @FXML
     private TableColumn<Batchable, String> batchCreatedAtCol;
     @FXML
@@ -53,7 +53,7 @@ public class BatchTableController {
         batchLocationCol.setCellValueFactory(new PropertyValueFactory<>("location"));
         batchExpiresAtCol.setCellValueFactory(cellData -> new SimpleStringProperty(formatterExp.format(cellData.getValue().getExpiresAt())));
         batchStatusCol.setCellValueFactory(new PropertyValueFactory<>("status"));
-        batchOwnerUsernameCol.setCellValueFactory(new PropertyValueFactory<>("ownerUsername"));
+        batchOwnerUsernameCol.setCellValueFactory(new PropertyValueFactory<>("ownerId"));
         batchCreatedAtCol.setCellValueFactory(cellData -> new SimpleStringProperty(formatter.format(cellData.getValue().getCreatedAt())));
         batchUpdatedAtCol.setCellValueFactory(cellData -> new SimpleStringProperty(formatter.format(cellData.getValue().getUpdatedAt())));
         batchTable.setItems(FXCollections.observableArrayList(data));

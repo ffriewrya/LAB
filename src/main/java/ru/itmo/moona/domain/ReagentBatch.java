@@ -28,7 +28,7 @@ public final class ReagentBatch implements Batchable {
     private ReagentBatch() {
     }
 
-    private final List<BatchMemento> history = new ArrayList<>();
+    private List<BatchMemento> history = new ArrayList<>();
 
     private ReagentBatch(BatchBuilder batchBuilder) {
         this.id = batchBuilder.id;
@@ -253,13 +253,13 @@ public final class ReagentBatch implements Batchable {
             return this;
         }
 
-        public BatchBuilder setCreatedAt() {
-            this.createdAt = Instant.now();
+        public BatchBuilder setCreatedAt(Instant createdAt) {
+            this.createdAt = createdAt;
             return this;
         }
 
-        public BatchBuilder setUpdatedAt() {
-            this.updatedAt = Instant.now();
+        public BatchBuilder setUpdatedAt(Instant updatedAt) {
+            this.updatedAt = updatedAt;
             return this;
         }
 
@@ -270,6 +270,10 @@ public final class ReagentBatch implements Batchable {
         }
 
 
+    }
+
+    public void setHistory(List <BatchMemento> m) {
+        this.history = m;
     }
 
     public void addMemento(BatchMemento m) {
@@ -312,10 +316,7 @@ public final class ReagentBatch implements Batchable {
         private Instant createdAt;
         private Instant updatedAt;
 
-        private BatchMemento() {
-        }
-
-        private BatchMemento(long id, long reagentId, String label, double quantityCurrent, BatchUnit unit, String location, Instant expiresAt, BatchStatus status, Long ownerId, Instant createdAt, Instant updatedAt) {
+        public BatchMemento(long id, long reagentId, String label, double quantityCurrent, BatchUnit unit, String location, Instant expiresAt, BatchStatus status, Long ownerId, Instant createdAt, Instant updatedAt) {
             this.id = id;
             this.reagentId = reagentId;
             this.label = label;
