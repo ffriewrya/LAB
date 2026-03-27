@@ -3,7 +3,6 @@ package ru.itmo.moona.database;
 import ru.itmo.moona.domain.BatchUnit;
 import ru.itmo.moona.domain.StockMove;
 import ru.itmo.moona.domain.StockMoveType;
-import ru.itmo.moona.service.StockManager;
 
 import java.sql.*;
 import java.util.HashMap;

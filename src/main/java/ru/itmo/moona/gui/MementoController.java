@@ -64,8 +64,7 @@ public class MementoController {
                         } else {
                             setStyle("");
                         }
-                    }
-                    else {
+                    } else {
                         setStyle(FINAL_STYLE);
                     }
                 }
@@ -91,8 +90,7 @@ public class MementoController {
                         } else {
                             setStyle("");
                         }
-                    }
-                    else {
+                    } else {
                         setStyle(FINAL_STYLE);
                     }
                 }
@@ -118,8 +116,7 @@ public class MementoController {
                         } else {
                             setStyle("");
                         }
-                    }
-                    else {
+                    } else {
                         setStyle(FINAL_STYLE);
                     }
                 }
@@ -145,8 +142,7 @@ public class MementoController {
                         } else {
                             setStyle("");
                         }
-                    }
-                    else {
+                    } else {
                         setStyle(FINAL_STYLE);
                     }
                 }
@@ -172,8 +168,7 @@ public class MementoController {
                         } else {
                             setStyle("");
                         }
-                    }
-                    else {
+                    } else {
                         setStyle(FINAL_STYLE);
                     }
                 }
@@ -192,15 +187,13 @@ public class MementoController {
                     int cur = getIndex();
                     int last = data.size() - 1;
                     if (cur == 0 || cur == last) {
-                            setStyle(FINAL_STYLE);
-                    }
-                    else {
+                        setStyle(FINAL_STYLE);
+                    } else {
                         setStyle("");
                     }
                 }
             }
         });
-
 
 
         historyTable.setItems(FXCollections.observableArrayList(data));

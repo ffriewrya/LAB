@@ -272,7 +272,7 @@ public final class ReagentBatch implements Batchable {
 
     }
 
-    public void setHistory(List <BatchMemento> m) {
+    public void setHistory(List<BatchMemento> m) {
         this.history = m;
     }
 

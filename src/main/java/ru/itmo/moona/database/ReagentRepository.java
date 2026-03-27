@@ -1,13 +1,9 @@
 package ru.itmo.moona.database;
 
 import ru.itmo.moona.domain.Reagent;
-import ru.itmo.moona.domain.ReagentBatch;
 
 import java.sql.*;
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 
 public class ReagentRepository {
 
@@ -31,7 +27,7 @@ public class ReagentRepository {
             statement.setObject(7, java.sql.Timestamp.from(reagent.getUpdatedAt()));
 
             try (ResultSet set = statement.executeQuery()) {
-                if (set.next())  reagent.setId(set.getLong(1));
+                if (set.next()) reagent.setId(set.getLong(1));
             }
         }
     }

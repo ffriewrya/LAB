@@ -50,15 +50,16 @@ public class LoginController {
     @FXML
     private void handleLogin() throws SQLException {
         try {
-        String login = username.getText();
-        String pass = password.getText();
-        User user = repository.getUser(login);
-        if (repository.authenticate(pass, user)) {
-            CurrentUser.getInstance().login(user);
-            app.showTable();
-        } else {
-            showError("wrong password");
-        } } catch (Exception e) {
+            String login = username.getText();
+            String pass = password.getText();
+            User user = repository.getUser(login);
+            if (repository.authenticate(pass, user)) {
+                CurrentUser.getInstance().login(user);
+                app.showTable();
+            } else {
+                showError("wrong password");
+            }
+        } catch (Exception e) {
             showError(e.getMessage());
         }
     }

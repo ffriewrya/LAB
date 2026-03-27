@@ -58,7 +58,7 @@ public class UserRepository {
         String sql = "SELECT * FROM users WHERE login = ?";
 
         try (Connection connection = manager.getConnection();
-        PreparedStatement statement = connection.prepareStatement(sql)) {
+             PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, login);
 
             try (ResultSet set = statement.executeQuery()) {
