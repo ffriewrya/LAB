@@ -20,18 +20,12 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.shape.SVGPath?>
 
-<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="800.0" prefWidth="1500.0" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.itmo.moona.gui.TableController">
+<AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="800.0" prefWidth="1500.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.itmo.moona.gui.TableController">
    <children>
       <VBox prefHeight="858.0" prefWidth="1614.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <children>
             <MenuBar>
               <menus>
-                <Menu mnemonicParsing="false" text="File">
-                  <items>
-                    <MenuItem mnemonicParsing="false" onAction="#handleSave" text="save" />
-                        <MenuItem mnemonicParsing="false" onAction="#handleLoad" text="load" />
-                  </items>
-                </Menu>
                   <Menu mnemonicParsing="false" text="Edit">
                     <items>
                       <MenuItem mnemonicParsing="false" onAction="#handleUndo" text="undo">
@@ -124,11 +118,11 @@
                                        <contextMenu>
                                           <ContextMenu>
                                             <items>
-                                                <MenuItem mnemonicParsing="false" onAction="#handleUpdateBatch" text="update batch" fx:id="updBatch"/>
+                                                <MenuItem fx:id="updBatch" mnemonicParsing="false" onAction="#handleUpdateBatch" text="update batch" />
                                                 <SeparatorMenuItem mnemonicParsing="false" />
                                               <MenuItem mnemonicParsing="false" onAction="#handleBatchHistory" text="batch history" />
                                                 <MenuItem mnemonicParsing="false" onAction="#handleMoveList" text="show batch moves" />
-                                                <MenuItem mnemonicParsing="false" onAction="#handleArchive" text="archive batch" fx:id="archiveBatch" />
+                                                <MenuItem fx:id="archiveBatch" mnemonicParsing="false" onAction="#handleArchive" text="archive batch" />
                                             </items>
                                           </ContextMenu>
                                        </contextMenu>

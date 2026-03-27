@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<AnchorPane prefHeight="500.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/23" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.itmo.moona.gui.MementoController">
+    <children>
+        <TableView fx:id="historyTable" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="500.0" prefWidth="1000.0">
+            <columns>
+                <TableColumn fx:id="batchLabelCol" prefWidth="75.0" text="label" />
+                <TableColumn fx:id="batchQuantityCol" prefWidth="75.0" text="quantity" />
+                <TableColumn fx:id="batchLocationCol" prefWidth="75.0" text="location" />
+                <TableColumn fx:id="batchExpiresAtCol" prefWidth="100.0" text="expires at" />
+                <TableColumn fx:id="batchStatusCol" prefWidth="100.0" text="status" />
+                <TableColumn fx:id="batchUpdatedAtCol" prefWidth="100.0" text="updated at" />
+            </columns>
+            <columnResizePolicy>
+                <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+            </columnResizePolicy>
+        </TableView>
+    </children>
+</AnchorPane>

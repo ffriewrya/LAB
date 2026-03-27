@@ -293,6 +293,20 @@ public class TableController {
         stage.show();
     }
 
+    private void newHistoryWindow(List<? extends Batchable> data, String title) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("../historyTable.fxml"));
+        Parent root = loader.load();
+        MementoController controller = loader.getController();
+        controller.setData(data);
+        Stage stage = new Stage();
+        stage.setTitle(title);
+        stage.setScene(new Scene(root));
+
+        stage.initModality(Modality.APPLICATION_MODAL);
+
+        stage.show();
+    }
+
     private void newMoveWindow(List<StockMove> data) throws IOException {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("../moveTable.fxml"));
         Parent root = loader.load();
@@ -377,7 +391,7 @@ public class TableController {
         ReagentBatch sel = batchTable.getSelectionModel().getSelectedItem();
         Long id = sel.getId();
         try {
-            newBatchWindow(sel.getHistory(), "batch history");
+            newHistoryWindow(sel.getHistory(), "batch history");
         } catch (IOException e) {
             showError("can't display batch history");
         }
