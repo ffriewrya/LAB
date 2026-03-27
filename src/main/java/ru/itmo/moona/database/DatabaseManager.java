@@ -24,6 +24,8 @@ public class DatabaseManager {
 
         } catch (IOException e) {
             throw new RuntimeException("haven't found .cfg file");
+        } catch (SQLException e) {
+            throw new IllegalArgumentException("database error");
         }
     }
 }
