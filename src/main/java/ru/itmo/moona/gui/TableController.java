@@ -280,7 +280,7 @@ public class TableController {
     }
 
     private void newBatchWindow(List<? extends Batchable> data, String title) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("../batchTable.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/batchTable.fxml"));
         Parent root = loader.load();
         BatchTableController controller = loader.getController();
         controller.setData(data);
@@ -294,7 +294,7 @@ public class TableController {
     }
 
     private void newHistoryWindow(List<? extends Batchable> data, String title) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("../historyTable.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/historyTable.fxml"));
         Parent root = loader.load();
         MementoController controller = loader.getController();
         controller.setData(data);
@@ -308,7 +308,7 @@ public class TableController {
     }
 
     private void newMoveWindow(List<StockMove> data) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("../moveTable.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/moveTable.fxml"));
         Parent root = loader.load();
         MoveTableController controller = loader.getController();
         controller.setData(data);
@@ -321,19 +321,6 @@ public class TableController {
         stage.show();
     }
 
-    private void newReagentWindow(List<Reagent> data) throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource(""));
-        Parent root = loader.load();
-        ReagentTableController controller = loader.getController();
-        controller.setData(data);
-        Stage stage = new Stage();
-        stage.setTitle("reagents");
-        stage.setScene(new Scene(root));
-
-        stage.initModality(Modality.APPLICATION_MODAL);
-
-        stage.show();
-    }
 
     @FXML
     private void handleRefresh() {
@@ -419,14 +406,6 @@ public class TableController {
         }
     }
 
-    @FXML
-    private void handleReagentList(String name) {
-        try {
-            newReagentWindow(manager.findReagent(name));
-        } catch (IOException e) {
-            showError("can't display reagent list");
-        }
-    }
 
     private void showError(String e) {
         Alert alert = new Alert(Alert.AlertType.ERROR);

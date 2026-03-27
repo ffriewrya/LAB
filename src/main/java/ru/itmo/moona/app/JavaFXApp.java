@@ -6,7 +6,6 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import ru.itmo.moona.database.*;
-import ru.itmo.moona.domain.users.User;
 import ru.itmo.moona.gui.LoginController;
 import ru.itmo.moona.gui.TableController;
 import ru.itmo.moona.service.StockManager;
@@ -31,7 +30,7 @@ public class JavaFXApp extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         this.primaryStage = primaryStage;
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("../loginWindow.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/loginWindow.fxml"));
         Scene scene = new Scene(loader.load());
 
         LoginController controller = loader.getController();
@@ -45,7 +44,7 @@ public class JavaFXApp extends Application {
     }
 
     public void showTable() throws IOException, SQLException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("../stockTable.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/stockTable.fxml"));
         Scene scene = new Scene(loader.load());
         TableController controller = loader.getController();
         controller.setManager(manager);
